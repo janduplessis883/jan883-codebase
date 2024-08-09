@@ -10,6 +10,7 @@ clean:
 	@rm -Rf build
 	@rm -Rf */__pycache__
 	@rm -Rf */*.pyc
+	@rm -f .cache.sqlite
 	@echo "🧽 Cleaned up successfully!"
 
 all: install clean
