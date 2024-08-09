@@ -19,7 +19,6 @@
 16. `ask_groq(prompt, model="llama3-70b-8192")`
 """
 
-
 import datetime
 import inspect
 import json
@@ -33,10 +32,10 @@ import pandas as pd
 import requests
 import seaborn as sns
 from bs4 import BeautifulSoup
-
+from groq import Groq
 from IPython.display import HTML, Markdown, display
 from newsapi import NewsApiClient
-
+from openai import OpenAI
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import (accuracy_score, auc, f1_score, make_scorer,
@@ -52,7 +51,13 @@ from tpot import TPOTClassifier
 warnings.filterwarnings("ignore")
 
 
-
+## Print Welcome Message
+def display_message():
+    message = "<b>😃 helper883</b> loaded! - run <code>import helper883</code> <code>list_functions(helper883)</code> for a list of functions."
+    html_message = f"""
+        <span style="color: #345a69; font-size: 12px;">{message}</span>
+    """
+    display(HTML(html_message))
 
 
 
@@ -406,7 +411,49 @@ def plot_loss_precision_recall_curve(history):
 
 
 # ------------------------------------------------  Perplexity Chat Endpoint ---
+def ask_perplexity(prompt):
+    """
+    Function to get a chat response from the Perplexity API using the provided prompt.
 
+    Args:
+    prompt (str): The prompt to send to the API.
+
+    Returns:
+    None: Displays the response content as Markdown.
+    """
+    # Get the API key from environment variables
+    api_key = os.getenv("PERPLEXITY_API_KEY")
+
+    if api_key is None:
+        raise ValueError("API key not found in environment variables.")
+
+    # Define the messages
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are an artificial intelligence assistant and you need to "
+                "engage in a helpful, detailed, polite conversation with a user."
+            ),
+        },
+        {
+            "role": "user",
+            "content": prompt,
+        },
+    ]
+
+    # Initialize the OpenAI client
+    client = OpenAI(api_key=api_key, base_url="https://api.perplexity.ai")
+
+    # Get the chat completion response
+    response = client.chat.completions.create(
+        model="llama-3-sonar-large-32k-online",
+        messages=messages,
+    )
+    content = response.choices[0].message.content
+
+    # Display the response content as Markdown
+    display(Markdown(content))
 
 
 # Example usage
@@ -424,7 +471,37 @@ def to_markdown(text):
     display(Markdown(text))
 
 
+def ask_ollama(user_prompt, model="llama3.1", format="text", temp="0"):
+    """
+    import the following for function to work:
+    from helper883 import *
+    """
 
+    # Define the endpoint URL and headers
+    url = "http://localhost:11434/api/generate"  # Update the URL to match your server's endpoint
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    # Define the payload with the prompt or input text
+    payload = {
+        "model": model,  # Replace with your model's name
+        "prompt": f"{user_prompt}. output_format={format}",
+        "max_tokens": 0,  # Adjust as needed
+        "stream": False,
+        "temprature": temp,
+    }
+
+    # Make the POST request
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+
+    # Check the response
+    if response.status_code == 200:
+        result = response.json()
+        return result["response"]
+    else:
+        print("Error:", response.status_code, response.text)
+        return False
 
 
 def send_to_notion(
@@ -501,7 +578,22 @@ def scrape_website(url_list, display_text=False):
     return cleaned_texts
 
 
+def ask_groq(prompt, model="llama3-70b-8192"):
+    client = Groq(
+        api_key=os.environ.get("GROQ_API_KEY"),
+    )
 
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        model=model,
+    )
+
+    return chat_completion.choices[0].message.content
 
 
 ## update as_groq and ask_ollama with arguments from this function
