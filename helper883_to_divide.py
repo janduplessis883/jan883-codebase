@@ -19,7 +19,6 @@
 16. `ask_groq(prompt, model="llama3-70b-8192")`
 """
 
-
 import datetime
 import inspect
 import json
@@ -39,23 +38,34 @@ from newsapi import NewsApiClient
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.inspection import permutation_importance
-from sklearn.metrics import (accuracy_score, auc, f1_score, make_scorer,
-                             precision_score, recall_score)
+from sklearn.metrics import (
+    accuracy_score,
+    auc,
+    f1_score,
+    make_scorer,
+    precision_score,
+    recall_score,
+)
+
 # from sklearn.metrics import plot_roc_curve
-from sklearn.model_selection import (StratifiedKFold, cross_validate,
-                                     learning_curve, train_test_split)
+from sklearn.model_selection import (
+    StratifiedKFold,
+    cross_validate,
+    learning_curve,
+    train_test_split,
+)
+
 # SKlearn imports
-from sklearn.preprocessing import (LabelEncoder, MinMaxScaler, OneHotEncoder,
-                                   RobustScaler, StandardScaler)
+from sklearn.preprocessing import (
+    LabelEncoder,
+    MinMaxScaler,
+    OneHotEncoder,
+    RobustScaler,
+    StandardScaler,
+)
 from tpot import TPOTClassifier
 
 warnings.filterwarnings("ignore")
-
-
-
-
-
-
 
 
 # functions start here -------------------------------------------------------------------------------------------------
@@ -408,7 +418,6 @@ def plot_loss_precision_recall_curve(history):
 # ------------------------------------------------  Perplexity Chat Endpoint ---
 
 
-
 # Example usage
 # prompt = "Give me an overview of how to connect the make.com API using Python"
 # get_chat_response(prompt)
@@ -422,52 +431,6 @@ def to_markdown(text):
     text (str): The markdown text to display.
     """
     display(Markdown(text))
-
-
-
-
-
-def send_to_notion(
-    subject,
-    content,
-    webhook_url="https://hook.eu1.make.com/cxfkal7tftsbjifdvj6vyiboley1xmld",
-):
-    """
-    Sends a webhook with the given subject and content.
-
-    Parameters:
-    webhook_url (str): The URL of the webhook to send the payload to.
-    subject (str): The subject of the webhook.
-    content (str): The content of the webhook.
-    """
-    # Create the payload
-    payload = {"subject": subject, "content": content}
-
-    # Send the POST request to the webhook URL with the payload
-    response = requests.post(webhook_url, json=payload)
-
-    # Check the response status
-    if response.status_code == 200:
-        print("Webhook sent successfully!")
-    else:
-        print(
-            f"Failed to send webhook. Status code: {response.status_code}, Response: {response.text}"
-        )
-
-
-def list_functions(module):
-    """
-    List all functions in the given module.
-
-    Args:
-    - module: The module to inspect.
-
-    Returns:
-    - A list of function names in the module.
-    """
-    functions = inspect.getmembers(module, inspect.isfunction)
-    function_names = [function_name for function_name, function in functions]
-    return function_names
 
 
 def scrape_website(url_list, display_text=False):
@@ -499,9 +462,6 @@ def scrape_website(url_list, display_text=False):
             print(f"An error occurred while processing {url}: {e}")
 
     return cleaned_texts
-
-
-
 
 
 ## update as_groq and ask_ollama with arguments from this function

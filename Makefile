@@ -15,8 +15,20 @@ clean:
 
 all: install clean
 
-app:
-	@streamlit run package/app.py
+icloud:
+	@python automation/icloud_email.py
+
+weather:
+	@python automation/weather_forcast.py
+
+image_renamer:
+	@python automation/image_renamer.py
+
+browser:
+	@python automation/browser_shortcut.py
+
+scheduler:
+	@python automation/automation_scheduler.py
 
 git_merge:
 	$(MAKE) clean

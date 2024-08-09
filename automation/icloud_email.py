@@ -13,6 +13,7 @@ from llm.ollama import ask_ollama
 
 today_string = datetime.now().isoformat()
 
+
 def log_to_file_and_console(message):
     with open("log/icloud_email.log", "a") as f:
         f.write(f"{message}\n")
@@ -62,25 +63,15 @@ def email():
         database_id = "57681de3f75044dea7d21f597101ff82"
         page_properties = {
             "Name": {
-                "title": [
-                    {
-                        "text": {
-                            "content": f"iCloud Email - {today_string}"
-                        }
-                    }
-                ]
+                "title": [{"text": {"content": f"iCloud Email - {today_string}"}}]
             },
-            "Date": {
-                "date": {
-                    "start": today_string
-                }
-            },
-            "Email Count": {
-                "number": numMessages
-            }
+            "Date": {"date": {"start": today_string}},
+            "Email Count": {"number": numMessages},
         }
-        response = nh.new_page_to_db(database_id=database_id, page_properties=page_properties)
-        page_id = response.get('id')
+        response = nh.new_page_to_db(
+            database_id=database_id, page_properties=page_properties
+        )
+        page_id = response.get("id")
         log_to_file_and_console(f"New page created with ID: {page_id}")
 
         ollama_summaries_list = []
@@ -139,7 +130,9 @@ def email():
 
             if ptBody:
                 log_to_file_and_console("- Plain Text Body:")
-                encoded_ptBody = cleaned_ptBody.encode("utf-8", "ignore").decode("utf-8")
+                encoded_ptBody = cleaned_ptBody.encode("utf-8", "ignore").decode(
+                    "utf-8"
+                )
                 log_to_file_and_console(encoded_ptBody)
                 log_to_file_and_console(" --------")
                 ollama_output = ask_ollama(
@@ -157,14 +150,9 @@ def email():
                         "type": "heading_2",
                         "heading_2": {
                             "rich_text": [
-                                {
-                                    "type": "text",
-                                    "text": {
-                                        "content": f"{subject}"
-                                    }
-                                }
+                                {"type": "text", "text": {"content": f"{subject}"}}
                             ]
-                        }
+                        },
                     },
                     {
                         "object": "block",
@@ -176,7 +164,7 @@ def email():
                                     "text": {
                                         "content": f"{email_addresses} - {email_date}",
                                         "link": None,
-                                    }
+                                    },
                                 }
                             ],
                             "color": "default",
@@ -187,15 +175,13 @@ def email():
                                         "rich_text": [
                                             {
                                                 "type": "text",
-                                                "text": {
-                                                    "content": f"{email_body}"
-                                                }
+                                                "text": {"content": f"{email_body}"},
                                             }
                                         ]
-                                    }
+                                    },
                                 }
-                            ]
-                        }
+                            ],
+                        },
                     },
                     {
                         "object": "block",
@@ -204,15 +190,11 @@ def email():
                             "rich_text": [
                                 {
                                     "type": "text",
-                                    "text": {
-                                        "content": f"🤖 - {ollama_output}"
-                                    },
-                                    "annotations": {
-                                        "color": "blue"
-                                    }
+                                    "text": {"content": f"🤖 - {ollama_output}"},
+                                    "annotations": {"color": "blue"},
                                 }
                             ]
-                        }
+                        },
                     },
                     {
                         "object": "block",
@@ -221,17 +203,15 @@ def email():
                             "rich_text": [
                                 {
                                     "type": "text",
-                                    "text": {
-                                        "content": f"🅾️ - {ollama_category}"
-                                    },
+                                    "text": {"content": f"🅾️ - {ollama_category}"},
                                     "annotations": {
                                         "color": "red",
                                         "bold": True,
-                                    }
+                                    },
                                 }
                             ]
-                        }
-                    }
+                        },
+                    },
                 ]
 
                 nh.append_page_body(page_id, blocks=blocks)
@@ -240,25 +220,25 @@ def email():
 
         log_to_file_and_console(ollama_summaries_list)
         ollama_summary = ask_ollama(
-                        f"\n<summary_of_emails>{ollama_summaries_list}</summary_of_emails>\nAbove is a list of email summaries you have created. Return a bullet list (markdown format) of the key insights and information."
-                    )
-        log_to_file_and_console(f"\nOllama Summary of all Emails _-----------------------------")
+            f"\n<summary_of_emails>{ollama_summaries_list}</summary_of_emails>\nAbove is a list of email summaries you have created. Return a bullet list (markdown format) of the key insights and information."
+        )
+        log_to_file_and_console(
+            f"\nOllama Summary of all Emails _-----------------------------"
+        )
         log_to_file_and_console(f"{ollama_summary}")
 
         blocks = [
-                {
+            {
                 "object": "block",
                 "type": "heading_1",
                 "heading_1": {
                     "rich_text": [
                         {
                             "type": "text",
-                            "text": {
-                                "content": f"💥 Summary of Email Chain"
-                            }
+                            "text": {"content": f"💥 Summary of Email Chain"},
                         }
                     ]
-                }
+                },
             },
             {
                 "object": "block",
@@ -267,15 +247,13 @@ def email():
                     "rich_text": [
                         {
                             "type": "text",
-                            "text": {
-                                "content": f"{ollama_summary[:1999]}"
-                            },
+                            "text": {"content": f"{ollama_summary[:1999]}"},
                             "annotations": {
                                 "color": "default",
-                            }
+                            },
                         }
                     ]
-                }
+                },
             },
         ]
 
@@ -284,11 +262,12 @@ def email():
     else:
         log_to_file_and_console(f"❌ Inbox Empty")
 
-
     # Disconnect from the IMAP server.
     success = imap.Disconnect()
 
-    log_to_file_and_console("\n🎉 Success: https://www.notion.so/janduplessis/PyNotion-c18faada67074eb2b39f4cb41390b521?pvs=4\n")
+    log_to_file_and_console(
+        "\n🎉 Success: https://www.notion.so/janduplessis/PyNotion-c18faada67074eb2b39f4cb41390b521?pvs=4\n"
+    )
 
 
 # Execute the main function.

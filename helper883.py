@@ -38,14 +38,31 @@ from newsapi import NewsApiClient
 from openai import OpenAI
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.inspection import permutation_importance
-from sklearn.metrics import (accuracy_score, auc, f1_score, make_scorer,
-                             precision_score, recall_score)
+from sklearn.metrics import (
+    accuracy_score,
+    auc,
+    f1_score,
+    make_scorer,
+    precision_score,
+    recall_score,
+)
+
 # from sklearn.metrics import plot_roc_curve
-from sklearn.model_selection import (StratifiedKFold, cross_validate,
-                                     learning_curve, train_test_split)
+from sklearn.model_selection import (
+    StratifiedKFold,
+    cross_validate,
+    learning_curve,
+    train_test_split,
+)
+
 # SKlearn imports
-from sklearn.preprocessing import (LabelEncoder, MinMaxScaler, OneHotEncoder,
-                                   RobustScaler, StandardScaler)
+from sklearn.preprocessing import (
+    LabelEncoder,
+    MinMaxScaler,
+    OneHotEncoder,
+    RobustScaler,
+    StandardScaler,
+)
 from tpot import TPOTClassifier
 
 warnings.filterwarnings("ignore")
@@ -58,9 +75,6 @@ def display_message():
         <span style="color: #345a69; font-size: 12px;">{message}</span>
     """
     display(HTML(html_message))
-
-
-
 
 
 # functions start here -------------------------------------------------------------------------------------------------

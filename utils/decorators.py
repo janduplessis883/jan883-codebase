@@ -3,6 +3,7 @@ from loguru import logger
 
 # = Decorators =================================================================
 
+
 def time_it(func):
     def wrapper(*args, **kwargs):
         func_name = func.__name__

@@ -1,6 +1,7 @@
 import os
 from openai import OpenAI
 
+
 def ask_perplexity(prompt):
     """
     Function to get a chat response from the Perplexity API using the provided prompt.

@@ -1,6 +1,7 @@
 from notion_client import Client
 import pprint
 
+
 class NotionHelper:
     """
     Class NotionHelper
@@ -94,15 +95,8 @@ class NotionHelper:
         # Define the properties for the database
         new_database = {
             "parent": {"type": "page_id", "page_id": parent_page_id},
-            "title": [
-                {
-                    "type": "text",
-                    "text": {
-                        "content": database_title
-                    }
-                }
-            ],
-            "properties": properties
+            "title": [{"type": "text", "text": {"content": database_title}}],
+            "properties": properties,
         }
 
         response = self.notion.databases.create(**new_database)
@@ -113,7 +107,7 @@ class NotionHelper:
 
         new_page = {
             "parent": {"database_id": database_id},
-            "properties": page_properties
+            "properties": page_properties,
         }
 
         response = self.notion.pages.create(**new_page)
@@ -122,12 +116,11 @@ class NotionHelper:
     def append_page_body(self, page_id, blocks):
         """Appends blocks of text to the body of a Notion page."""
 
-        new_blocks = {
-            "children": blocks
-        }
+        new_blocks = {"children": blocks}
 
         response = self.notion.blocks.children.append(block_id=page_id, **new_blocks)
         return response
+
 
 # Usage example:
 # parent_page_id = "your_parent_page_id"
