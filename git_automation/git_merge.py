@@ -5,6 +5,8 @@ from colorama import Fore, init
 
 init(autoreset=True)
 
+from utils.params import LOCAL_GIT_REPO
+from utils.decorators import time_it
 
 repo_path = LOCAL_GIT_REPO
 

@@ -1,14 +1,20 @@
 import sys
 import chilkat
 from bs4 import BeautifulSoup
-from helper883 import *
-from notionhelper import *
-
 from datetime import datetime
+import os
+
+icloud_email_pass = os.environ.get("ICLOUD_EMAIL_PASSWORD")
+
+# Local Imports
+from notion_api.notionhelper import NotionHelper
+from llm.ollama import ask_ollama
+
+
 today_string = datetime.now().isoformat()
 
 def log_to_file_and_console(message):
-    with open("email_chain.txt", "a") as f:
+    with open("log/icloud_email.log", "a") as f:
         f.write(f"{message}\n")
     sys.stdout.write(f"{message}\n")
 
@@ -29,7 +35,7 @@ def email():
 
     # The username is usually the name part of your iCloud email address
     # (for example, emilyparker, not emilyparker@icloud.com).
-    success = imap.Login("drjanduplessis", "mayx-eiwe-ypll-gslb")
+    success = imap.Login("drjanduplessis", icloud_email_pass)
     if success != True:
         log_to_file_and_console(imap.lastErrorText())
         sys.exit()
@@ -232,54 +238,57 @@ def email():
 
             ollama_summaries_list.append(ollama_output)
 
-    log_to_file_and_console(ollama_summaries_list)
-    ollama_summary = ask_ollama(
-                    f"\n<summary_of_emails>{ollama_summaries_list}</summary_of_emails>\nAbove is a list of email summaries you have created. Return a bullet list (markdown format) of the key insights and information."
-                )
-    log_to_file_and_console(f"\nOllama Summary of all Emails _-----------------------------")
-    log_to_file_and_console(f"{ollama_summary}")
+        log_to_file_and_console(ollama_summaries_list)
+        ollama_summary = ask_ollama(
+                        f"\n<summary_of_emails>{ollama_summaries_list}</summary_of_emails>\nAbove is a list of email summaries you have created. Return a bullet list (markdown format) of the key insights and information."
+                    )
+        log_to_file_and_console(f"\nOllama Summary of all Emails _-----------------------------")
+        log_to_file_and_console(f"{ollama_summary}")
 
-    blocks = [
+        blocks = [
+                {
+                "object": "block",
+                "type": "heading_1",
+                "heading_1": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": f"💥 Summary of Email Chain"
+                            }
+                        }
+                    ]
+                }
+            },
             {
-            "object": "block",
-            "type": "heading_1",
-            "heading_1": {
-                "rich_text": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": f"💥 Summary of Email Chain"
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": f"{ollama_summary[:1999]}"
+                            },
+                            "annotations": {
+                                "color": "default",
+                            }
                         }
-                    }
-                ]
-            }
-        },
-        {
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": f"{ollama_summary[:1999]}"
-                        },
-                        "annotations": {
-                            "color": "default",
-                        }
-                    }
-                ]
-            }
-        },
-    ]
+                    ]
+                }
+            },
+        ]
 
-    nh.append_page_body(page_id, blocks=blocks)
+        nh.append_page_body(page_id, blocks=blocks)
+
+    else:
+        log_to_file_and_console(f"❌ Inbox Empty")
 
 
     # Disconnect from the IMAP server.
     success = imap.Disconnect()
 
-    log_to_file_and_console("Success.")
+    log_to_file_and_console("\n🎉 Success: https://www.notion.so/janduplessis/PyNotion-c18faada67074eb2b39f4cb41390b521?pvs=4\n")
 
 
 if __name__ == "__main__":
