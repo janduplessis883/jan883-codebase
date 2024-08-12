@@ -6,7 +6,7 @@ This is a collection of code snippets by myself, to use in local projects.
 
 The following line of code is added to `~/.bash_profile` or `~/.zshrc` file:
 ```
-export PYTHONPATH="/Users/janduplessis/code/janduplessis883/jan883-codebase:$PYTHONPATH"
+export PYTHONPATH="/path/jan883-codebase:$PYTHONPATH"
 ```
 ### Codebase Structure
 ```
