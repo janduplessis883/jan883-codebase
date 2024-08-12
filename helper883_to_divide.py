@@ -69,7 +69,7 @@ warnings.filterwarnings("ignore")
 
 
 # functions start here -------------------------------------------------------------------------------------------------
-def scale_df(df, scaler="minmax"):
+def scale_df(X_train, scaler="minmax"):
     """
     Function to scale the numerical features of a dataframe.
 
@@ -90,15 +90,15 @@ def scale_df(df, scaler="minmax"):
         raise ValueError('Invalid scaler type. Choose "standard" or "minimax".')
 
     # Get the column headers
-    column_headers = df.columns
+    column_headers = X_train.columns
     # Fit the scaler to the data and transform the data
-    scaled_values = scaler.fit_transform(df)
+    scaled_values = scaler.fit_transform(X_train)
 
     # Convert the transformed data back to a DataFrame, preserving the column headers
-    scaled_df = pd.DataFrame(scaled_values, columns=column_headers)
+    scaled_X_train = pd.DataFrame(scaled_values, columns=column_headers)
 
-    print(f"✅ Data Scaled: {scaler} - {scaled_df.shape}")
-    return scaled_df
+    print(f"✅ Data Scaled: {scaler} - {scaled_X_train.shape}")
+    return scaled_X_train
 
 
 def oversample_SMOTE(
