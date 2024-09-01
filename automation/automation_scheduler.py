@@ -9,7 +9,7 @@ from tqdm import tqdm
 init()  # Initializes Colorama
 
 now = pendulum.now()
-delay_hours = 2
+delay_hours = 4
 delay_seconds = delay_hours * 60 * 60
 
 
@@ -32,11 +32,6 @@ for i in range(0, 100, 1):
     print("Running iCloud Email")
     run_script(
         "/Users/janduplessis/code/janduplessis883/jan883-codebase/automation/icloud_email.py"
-    )
-
-    print("Running Weather Forecast")
-    run_script(
-        "/Users/janduplessis/code/janduplessis883/jan883-codebase/automation/weather_forcast.py"
     )
 
     for _ in tqdm(range(delay_seconds), desc="Waiting...", colour="#d7bd5b"):

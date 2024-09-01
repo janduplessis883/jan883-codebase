@@ -8,8 +8,11 @@ icloud_email_pass = os.environ.get("ICLOUD_EMAIL_PASSWORD")
 
 # Local Imports
 from notion_api.notionhelper import NotionHelper
+from google_sheets.sheethelper import *
 from llm.ollama import ask_ollama
+from notion_client.errors import APIResponseError
 
+sheethelper = SheetHelper(sheet_url='https://docs.google.com/spreadsheets/d/1k42kAuOIGDg83wP66dbZM9Zm69AdzPDNW6iKusMM6E4/edit?gid=0#gid=0')
 
 today_string = datetime.now().isoformat()
 
@@ -129,98 +132,141 @@ def email():
             ]
 
             if ptBody:
-                log_to_file_and_console("- Plain Text Body:")
-                encoded_ptBody = cleaned_ptBody.encode("utf-8", "ignore").decode(
-                    "utf-8"
-                )
-                log_to_file_and_console(encoded_ptBody)
-                log_to_file_and_console(" --------")
-                ollama_output = ask_ollama(
-                    f"<email_body>{cleaned_ptBody}</email_body>\nSummarize the above email body content in no more than 3 sentences."
-                )
-                log_to_file_and_console(f"🤖 {ollama_output}")
-                ollama_category = ask_ollama(
-                    f"<email_body>{cleaned_ptBody}</email_body>\nClassify this email in to one of the following categories {categories}. Only return the category in upper case. Do not output any explanatory text."
-                )
-                log_to_file_and_console(f"🅾️ - {ollama_category}")
+                try:
+                    log_to_file_and_console("- Plain Text Body:")
+                    encoded_ptBody = cleaned_ptBody.encode("utf-8", "ignore").decode(
+                        "utf-8"
+                    )
+                    log_to_file_and_console(encoded_ptBody)
+                    log_to_file_and_console(" --------")
+                    ollama_output = ask_ollama(
+                        f"<email_body>{cleaned_ptBody}</email_body>\nSummarize the above email body in two sentences."
+                    )
+                    ollama_to_do = ask_ollama(
+                        f"""[INSTR]<email_body>{cleaned_ptBody}</email_body>Task: Extract [TO-DO] list items from the provided email text, focusing on items that require action, follow-up, or information.
+                        Parameters: 1. **Identify questions**: Extract any sentences or phrases that contain questions, indicating a need for clarification or additional information. 2. **Detect requests**: Find statements that explicitly request something, such as "Please", "Could you", or "I would appreciate it if". 3. **Flag follow-ups**: Highlight any mentions of scheduled meetings, calls, or tasks that require follow-up or completion.
+                        4. **Exclude**: Ignore general statements, introductions, conclusions, and sentences that do not contain actionable items. If none of these conditions are met output only 'No To-Do List', only output the To-Do list itself without any explanitory text. Promotional emails and Newsletter email to-do items should only be listed if a direct questions is asked.
+                        Only use plain text in your response, do not use markdown or html.[/INSTR]"""
+                    )
 
-                blocks = [
-                    {
-                        "object": "block",
-                        "type": "heading_2",
-                        "heading_2": {
-                            "rich_text": [
-                                {"type": "text", "text": {"content": f"{subject}"}}
-                            ]
+                    log_to_file_and_console(f"🤖 {ollama_output}")
+                    ollama_category = ask_ollama(
+                        f"<email_body>{cleaned_ptBody}</email_body>\nClassify this email in to one of the following categories {categories}. Only return the category in upper case. Do not output any explanatory text."
+                    )
+                    log_to_file_and_console(f"🅾️ - {ollama_category}")
+                    log_to_file_and_console(f"✅ - TO-DO list: {ollama_to_do}")
+                    blocks = [
+                        {
+                            "object": "block",
+                            "type": "heading_2",
+                            "heading_2": {
+                                "rich_text": [
+                                    {"type": "text", "text": {"content": f"{subject}"}}
+                                ]
+                            },
                         },
-                    },
-                    {
-                        "object": "block",
-                        "type": "toggle",
-                        "toggle": {
-                            "rich_text": [
-                                {
-                                    "type": "text",
-                                    "text": {
-                                        "content": f"{email_addresses} - {email_date}",
-                                        "link": None,
-                                    },
-                                }
-                            ],
-                            "color": "default",
-                            "children": [
-                                {
-                                    "type": "paragraph",
-                                    "paragraph": {
-                                        "rich_text": [
-                                            {
-                                                "type": "text",
-                                                "text": {"content": f"{email_body}"},
-                                            }
-                                        ]
-                                    },
-                                }
-                            ],
+                        {
+                            "object": "block",
+                            "type": "toggle",
+                            "toggle": {
+                                "rich_text": [
+                                    {
+                                        "type": "text",
+                                        "text": {
+                                            "content": f"{email_addresses} - {email_date}",
+                                            "link": None,
+                                        },
+                                    }
+                                ],
+                                "color": "default",
+                                "children": [
+                                    {
+                                        "type": "paragraph",
+                                        "paragraph": {
+                                            "rich_text": [
+                                                {
+                                                    "type": "text",
+                                                    "text": {"content": f"{email_body}"},
+                                                }
+                                            ]
+                                        },
+                                    }
+                                ],
+                            },
                         },
-                    },
-                    {
-                        "object": "block",
-                        "type": "paragraph",
-                        "paragraph": {
-                            "rich_text": [
-                                {
-                                    "type": "text",
-                                    "text": {"content": f"🤖 - {ollama_output}"},
-                                    "annotations": {"color": "blue"},
-                                }
-                            ]
+                        {
+                            "object": "block",
+                            "type": "paragraph",
+                            "paragraph": {
+                                "rich_text": [
+                                    {
+                                        "type": "text",
+                                        "text": {"content": f"🤖 - {ollama_output}"},
+                                        "annotations": {"color": "blue"},
+                                    }
+                                ]
+                            },
                         },
-                    },
-                    {
-                        "object": "block",
-                        "type": "paragraph",
-                        "paragraph": {
-                            "rich_text": [
-                                {
-                                    "type": "text",
-                                    "text": {"content": f"🅾️ - {ollama_category}"},
-                                    "annotations": {
-                                        "color": "red",
-                                        "bold": True,
-                                    },
-                                }
-                            ]
+                        {
+                            "object": "block",
+                            "type": "paragraph",
+                            "paragraph": {
+                                "rich_text": [
+                                    {
+                                        "type": "text",
+                                        "text": {"content": f"🅾️ - {ollama_category}"},
+                                        "annotations": {
+                                            "color": "red",
+                                            "bold": True,
+                                        },
+                                    }
+                                ]
+                            },
                         },
-                    },
-                ]
+                        {
+                            "object": "block",
+                            "type": "paragraph",
+                            "paragraph": {
+                                "rich_text": [
+                                    {
+                                        "type": "text",
+                                        "text": {"content": f"✅ - {ollama_to_do}"},
+                                        "annotations": {
+                                            "color": "green",
+                                            "bold": False,
+                                        },
+                                    }
+                                ]
+                            },
+                        },
+                    ]
 
-                nh.append_page_body(page_id, blocks=blocks)
+                    nh.append_page_body(page_id, blocks=blocks)
+
+                    # Send email to Google Sheet
+                    # Clean to_do list for Google Sheet
+                    cleaned_todo = ollama_to_do.split()
+                    cleaned_todo = " ".join(cleaned_todo)
+                    date = email_date
+                    subject = subject
+                    email = email_addresses
+                    summary = ollama_output
+                    to_do = cleaned_todo
+                    body = encoded_ptBody
+                    notion_page_id = page_id
+                    chroma_status = 0
+                    category = ollama_category
+
+                    email_list = [date, subject, email, summary, to_do, body, category, notion_page_id, chroma_status]
+                    sheethelper.append_row(email_list)
+                except APIResponseError as e:
+                    print(f"APIResponseError {e}")
 
             ollama_summaries_list.append(ollama_output)
 
         log_to_file_and_console(ollama_summaries_list)
         ollama_summary = ask_ollama(
-            f"\n<summary_of_emails>{ollama_summaries_list}</summary_of_emails>\nAbove is a list of email summaries you have created. Return a bullet list (markdown format) of the key insights and information."
+            f"\n<summary_of_emails>{ollama_summaries_list}</summary_of_emails>\nSummarize this, highlighting important information."
         )
         log_to_file_and_console(
             f"\nOllama Summary of all Emails _-----------------------------"

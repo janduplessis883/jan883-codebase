@@ -30,6 +30,12 @@ browser:
 scheduler:
 	@python automation/automation_scheduler.py
 
+news_scheduler:
+	@python automation/daily_scheduler.py
+
+organize_folders:
+	@python automation/organize_files.py
+
 git_merge:
 	$(MAKE) clean
 	@python git_automation/git_merge.py

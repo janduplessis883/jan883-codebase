@@ -33,8 +33,9 @@ researcher = Agent(
         to conclude the write-up"""
     ),
     tools=[serper_tool, scrape_tool],
-    allow_delegation=False,
+    allow_delegation=True,
     cache=True,
+    allow_code_execution=True,
 )
 
 writer = Agent(
@@ -47,9 +48,10 @@ writer = Agent(
         " Your mission is to take information gathered by the researcher and distill it into a well thought out piece of written text."
         " write a detailed report of the subject matter including references to source of information."
     ),
-    tools=[],
-    allow_delegation=False,
+    tools=[serper_tool, scrape_tool],
+    allow_delegation=True,
     cache=True,
+    allow_code_execution=True,
 )
 
 # Create the task
