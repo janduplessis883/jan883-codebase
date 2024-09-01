@@ -141,3 +141,6 @@ data/
 secrets.toml
 secret/
 log/
+database/
+
+
