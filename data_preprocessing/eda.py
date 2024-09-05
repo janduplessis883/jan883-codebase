@@ -87,6 +87,7 @@ def eda1():
 <b>Custom Functions</b><br>- <code>update_column_names(df)</code> Update Column names, replace " " with "_".<BR>
 - <code>label_encode_column(df, col_name)</code> Label encode a df column returing a df with the new column (original col dropped).<BR>
 - <code>one_hot_encode_column(df, col_name)</code> One Hot Encode a df column returing a df with the new column (original col dropped).<BR>
+- <code>train_no_outliers = remove_outliers_zscore(train, threshold=3)</code> Remove outliers using Z score.
 """
 
     html_message = f"""
@@ -1490,3 +1491,31 @@ def impute_values(df, missing_values=0, copy=True, strategy='mean', columns=None
     df[columns] = imputer.fit_transform(df[columns])
 
     return df
+
+
+def remove_outliers_zscore(df, threshold=3):
+    """
+    Remove outliers from a DataFrame based on the Z-score method.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+    threshold (float): The Z-score threshold to identify outliers (default is 3).
+
+    Returns:
+    pd.DataFrame: A DataFrame with outliers removed.
+    """
+    # Calculate the mean and standard deviation of each column
+    mean = df.mean()
+    std_dev = df.std()
+
+    # Calculate the Z-scores for each column
+    z_scores = (df - mean) / std_dev
+
+    # Filter rows where the absolute Z-score is below the threshold for all columns
+    no_outliers_df = df[(np.abs(z_scores) < threshold).all(axis=1)]
+
+    return no_outliers_df
+
+# Example usage:
+# Assuming you have a DataFrame named 'train'
+# train_no_outliers = remove_outliers_zscore(train)

@@ -15,6 +15,9 @@ clean:
 
 all: install clean
 
+app:
+	@streamlit run streamlit_app.py
+
 icloud:
 	@python automation/icloud_email.py
 
