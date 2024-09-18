@@ -4,6 +4,12 @@ from urllib.parse import urljoin, urlparse
 import re
 import os
 
+import os
+import re
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
+
 def scrape_website(start_url, depth, scrape_external=False):
     """
     Scrapes the text content from the start URL and each link up to the specified depth,
@@ -100,7 +106,6 @@ def scrape_website(start_url, depth, scrape_external=False):
                 # Mark this URL as scraped
                 scraped_urls.add(url)
 
-
         # Update the list of URLs to scrape with the new URLs for the next depth level
         print(f"\n💥 URL's to scrape: {len(new_urls)}")
         urls_to_scrape = new_urls
@@ -108,7 +113,11 @@ def scrape_website(start_url, depth, scrape_external=False):
     print(f"Saved combined text content to '{file_name}'")
     print(f"You can find the output file at: {file_name}")
 
-    return file_name
+    # Read the combined text content from the file and return it
+    with open(file_name, 'r', encoding='utf-8') as file:
+        combined_text = file.read()
+
+    return combined_text
 
 # Example usage in Jupyter Notebook
 # start_url = "https://docs.crewai.com"  # Replace with the URL you want to scrape
