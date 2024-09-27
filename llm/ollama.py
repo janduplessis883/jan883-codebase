@@ -35,6 +35,27 @@ def ask_ollama(user_prompt, model="llama3.1", format="text", temp="0"):
         return False
 
 def mini_check_ollama(document=None, claim=None, model="bespoke-minicheck:latest", format="text", temp="0"):
+    """
+    Miniature fact-checking tool using Hugging Face's Transformers.
+
+    Args:
+        document (str, optional): The text to examine. Defaults to user input if not provided.
+        claim (str, optional): The sentence to check against the document. Defaults to user input if not provided.
+        model (str, optional): Name of the pre-trained language model to use. Defaults to "bespoke-minicheck:latest".
+        format (str, optional): Output format. Currently only supports "text". Defaults to "text".
+        temp (int or str, optional): Temperature value for the model's randomness. Defaults to 0.
+
+    Returns:
+        str: The result of the fact-checking ("Yes", "No", or explanation).
+
+    Notes:
+        This function is designed to be used in a sequential manner: pass in a document and claim, then use the output as input to another instance.
+        If no document or claim are provided, the user will be prompted to enter them.
+        The model takes as input a document (text) and a sentence and determines whether the sentence is supported by the document.
+
+    Raises:
+        Exception: If there is an error with the API request.
+    """
     print("Bespoke-MiniCheck\nThe model takes as input a document (text) and a sentence and determines whether the sentence is supported by the document. In order to fact-check a multi-sentence claim, the claim should first be broken up into sentences. The document does not need to be chunked unless it exceeds 32K tokens.\n")
 
     if document == None and claim == None:

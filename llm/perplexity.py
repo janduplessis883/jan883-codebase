@@ -38,7 +38,7 @@ def ask_perplexity(prompt):
 
     # Get the chat completion response
     response = client.chat.completions.create(
-        model="llama-3-sonar-large-32k-online",
+        model="llama-3.1-sonar-small-128k-online",
         messages=messages,
     )
     content = response.choices[0].message.content

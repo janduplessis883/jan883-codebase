@@ -84,10 +84,12 @@ def eda1():
 5. Mapping / Binning of Categorical Features<BR>
 6. LabelEncode a column.<BR>
 7. OneHotEncode a column.<BR>
+8. Impute missing values<br>
 <b>Custom Functions</b><br>- <code>update_column_names(df)</code> Update Column names, replace " " with "_".<BR>
 - <code>label_encode_column(df, col_name)</code> Label encode a df column returing a df with the new column (original col dropped).<BR>
 - <code>one_hot_encode_column(df, col_name)</code> One Hot Encode a df column returing a df with the new column (original col dropped).<BR>
-- <code>train_no_outliers = remove_outliers_zscore(train, threshold=3)</code> Remove outliers using Z score.
+- <code>train_no_outliers = remove_outliers_zscore(train, threshold=3)</code> Remove outliers using Z score.<BR>
+- <code>df_imputed = impute_missing_values(df, strategy='median')</code> Impute missing values in DF
 """
 
     html_message = f"""
@@ -1519,3 +1521,31 @@ def remove_outliers_zscore(df, threshold=3):
 # Example usage:
 # Assuming you have a DataFrame named 'train'
 # train_no_outliers = remove_outliers_zscore(train)
+
+
+def impute_missing_values(df, strategy='mean'):
+    """
+    Fills NaN values in the given DataFrame using the specified strategy.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame.
+        strategy (str): The imputation strategy. Options include 'mean', 'median', 'most_frequent', and 'constant'.
+                        Default is 'mean'.
+
+    Returns:
+        pd.DataFrame: DataFrame with NaN values filled.
+    """
+    # Create a copy of the dataframe to avoid modifying the original one
+    df_imputed = df.copy()
+
+    # Iterate over each column in the dataframe
+    for column in df_imputed.columns:
+        # Check if the column has missing values
+        if df_imputed[column].isnull().sum() > 0:
+            # Create a SimpleImputer object with the desired strategy
+            imputer = SimpleImputer(strategy=strategy)
+
+            # Reshape the column to 2D array for imputation and fit/transform
+            df_imputed[column] = imputer.fit_transform(df_imputed[[column]])
+
+    return df_imputed

@@ -2,7 +2,7 @@ import os
 from groq import Groq
 
 
-def ask_groq(prompt, model="llama3-70b-8192"):
+def ask_groq(prompt, model="llama-3.1-sonar-small-128k-online"):
     client = Groq(
         api_key=os.environ.get("GROQ_API_KEY"),
     )
