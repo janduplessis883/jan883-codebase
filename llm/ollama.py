@@ -1,13 +1,14 @@
 import requests
 import json
 
-
-def ask_ollama(user_prompt, model="llama3.1", format="text", temp="0"):
+# %%
+def ask_ollama(user_prompt, system_prompt="You are a helpful AI assistant.", model="llama3.1", format="plain text", temp=0, max_tokens=0):
     """
     import the following for function to work:
     from helper883 import *
     """
 
+    output_format = f"PLEASE MAKE SURE YOUR OUTPUT IS IN THE FOLLOWING FORMAT: {format}."
     # Define the endpoint URL and headers
     url = "http://localhost:11434/api/generate"  # Update the URL to match your server's endpoint
     headers = {
@@ -16,11 +17,14 @@ def ask_ollama(user_prompt, model="llama3.1", format="text", temp="0"):
 
     # Define the payload with the prompt or input text
     payload = {
-        "model": model,  # Replace with your model's name
-        "prompt": f"{user_prompt}. <output_format>{format}</output_format>",
-        "max_tokens": 0,  # Adjust as needed
+        "model": model,
+        "system": f"system_prompt {output_format}",
+        "prompt": user_prompt,
+        "max_tokens": max_tokens,
         "stream": False,
-        "temprature": temp,
+        "options": {
+                "temperature": temp,
+                },
     }
 
     # Make the POST request
@@ -102,3 +106,5 @@ def mini_check_ollama(document=None, claim=None, model="bespoke-minicheck:latest
 #     context="Eggs are my favourite food.",
 # )
 # print(response.support_prob)
+
+# %%

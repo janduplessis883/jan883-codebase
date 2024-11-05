@@ -457,3 +457,73 @@ def test_classification_models(X, y, test_size=0.2, random_state=None, scale_dat
     results_df = results_df.sort_values(by='Accuracy', ascending=False).reset_index(drop=True)
 
     return results_df
+
+def test_classification_models_multiclass(X, y, test_size=0.2, random_state=None, scale_data=False):
+    """
+    Tests multiple classification models from sklearn on the given dataset.
+
+    Parameters:
+    - X: DataFrame or array-like. The feature set.
+    - y: Series or array-like. The target variable.
+    - test_size: float, default=0.2. The proportion of the dataset to include in the test split.
+    - random_state: int, default=None. Random state for reproducibility.
+    - scale_data: bool, default=False. Whether to scale the data using StandardScaler.
+
+    Returns:
+    - results_df: DataFrame. A DataFrame containing the model name, accuracy, precision, recall, F1 score, and ROC-AUC score for each model.
+    """
+
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
+
+    # Define a list of classification models to test
+    models = {
+        "Logistic Regression": LogisticRegression(),
+        "Decision Tree": DecisionTreeClassifier(),
+        "Random Forest": RandomForestClassifier(),
+        "Gradient Boosting": GradientBoostingClassifier(),
+        "AdaBoost": AdaBoostClassifier(),
+        "Support Vector Classifier": SVC(probability=True),
+        "K-Nearest Neighbors": KNeighborsClassifier(),
+        "MLP Classifier": MLPClassifier(max_iter=1000),
+        "Naive Bayes": GaussianNB()
+    }
+
+    # DataFrame to store results
+    results = []
+
+    # Loop over models and evaluate each one with a progress bar
+    for name, model in tqdm(models.items(), desc="Testing Models"):
+        # Create a pipeline if scaling is requested
+        if scale_data:
+            pipeline = Pipeline([('scaler', StandardScaler()), ('classifier', model)])
+            pipeline.fit(X_train, y_train)
+            y_pred = pipeline.predict(X_test)
+            y_proba = pipeline.predict_proba(X_test) if hasattr(pipeline, "predict_proba") else None
+        else:
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            y_proba = model.predict_proba(X_test) if hasattr(model, "predict_proba") else None
+
+        # Calculate metrics
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred, average='weighted')
+        recall = recall_score(y_test, y_pred, average='weighted')
+        f1 = f1_score(y_test, y_pred, average='weighted')
+        roc_auc = roc_auc_score(y_test, y_proba, multi_class='ovr', average='weighted') if y_proba is not None else None
+
+        # Append the results to the list
+        results.append({
+            "Model": name,
+            "Accuracy": accuracy,
+            "Precision": precision,
+            "Recall": recall,
+            "F1 Score": f1,
+            "ROC-AUC": roc_auc
+        })
+
+    # Convert the results list to a DataFrame
+    results_df = pd.DataFrame(results)
+    results_df = results_df.sort_values(by='Accuracy', ascending=False).reset_index(drop=True)
+
+    return results_df

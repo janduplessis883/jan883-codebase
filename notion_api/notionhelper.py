@@ -1,5 +1,6 @@
 from notion_client import Client
 import pprint
+import pandas as pd
 
 
 class NotionHelper:
@@ -16,6 +17,8 @@ class NotionHelper:
     - create_database(self, parent_page_id, database_title, properties): Creates a new database in Notion.
     - new_page_to_db(self, database_id, page_properties): Adds a new page to a Notion database.
     - append_page_body(self, page_id, blocks): Appends blocks of text to the body of a Notion page.
+    - get_all_page_ids(self, database_id): Returns the IDs of all pages in a given database.
+    - get_all_pages_as_json(self, database_id): Returns a list of JSON objects representing all pages in the given database, with all properties.
 
     Usage:
     - Instantiate a `NotionHelper` object.
@@ -24,6 +27,8 @@ class NotionHelper:
     - Call the `create_database` method to create a new database in Notion.
     - Call the `new_page_to_db` method to add a new page to a Notion database.
     - Call the `append_page_body` method to append blocks of text to a Notion page.
+    - Call the `get_all_page_ids` method to get the IDs of all pages in a database.
+    - Call the `get_all_pages_as_json` method to get all pages as JSON objects.
     """
 
     def __init__(self):
@@ -79,15 +84,21 @@ class NotionHelper:
         # pprint.pprint(page)
 
     def notion_get_page(self, page_id):
-        """Returns the heading and an array of blocks on a Notion page given its page_id."""
+        """Returns the JSON of the page properties and an array of blocks on a Notion page given its page_id."""
 
+        # Retrieve the page and block data
         page = self.notion.pages.retrieve(page_id)
         blocks = self.notion.blocks.children.list(page_id)
-        heading = page["properties"]["Subject"]["title"][0]["text"]["content"]
+
+        # Extract all properties as a JSON object
+        properties = page.get("properties", {})
         content = [block for block in blocks["results"]]
 
-        print(heading)
-        return content
+        # Print the full JSON of the properties
+        print(properties)
+
+        # Return the properties JSON and blocks content
+        return {"properties": properties, "content": content}
 
     def create_database(self, parent_page_id, database_title, properties):
         """Creates a new database in Notion."""
@@ -121,82 +132,123 @@ class NotionHelper:
         response = self.notion.blocks.children.append(block_id=page_id, **new_blocks)
         return response
 
+    def get_all_page_ids(self, database_id):
+        """Returns the IDs of all pages in a given database."""
 
-# Usage example:
-# parent_page_id = "your_parent_page_id"
-# database_title = "My New Database"
-# properties = {
-#     "Name": {
-#         "title": {}
-#     },
-#     "Date": {
-#         "date": {}
-#     },
-#     "Email Count": {
-#         "number": {}
-#     }
-# }
+        my_pages = self.notion.databases.query(database_id=database_id)
+        page_ids = [page["id"] for page in my_pages["results"]]
+        return page_ids
 
-# notion_helper = NotionHelper()
-# notion_helper.create_database(parent_page_id, database_title, properties)
+    def get_all_pages_as_json(self, database_id, limit=None):
+        """Returns a list of JSON objects representing all pages in the given database, with all properties.
+           You can specify the number of entries to be loaded using the `limit` parameter.
+        """
 
-# # Assuming the database was created and you have its ID
-# database_id = "your_database_id"
+        # Use pagination to remove any limits on number of entries, optionally limited by `limit` argument
+        pages_json = []
+        has_more = True
+        start_cursor = None
+        count = 0
 
-# page_properties = {
-#     "Name": {
-#         "title": [
-#             {
-#                 "text": {
-#                     "content": "Example Page"
-#                 }
-#             }
-#         ]
-#     },
-#     "Date": {
-#         "date": {
-#             "start": "2024-08-01"
-#         }
-#     },
-#     "Email Count": {
-#         "number": 10
-#     }
-# }
+        while has_more:
+            my_pages = self.notion.databases.query(
+                **{
+                    "database_id": database_id,
+                    "start_cursor": start_cursor,
+                }
+            )
+            pages_json.extend([page["properties"] for page in my_pages["results"]])
+            has_more = my_pages.get("has_more", False)
+            start_cursor = my_pages.get("next_cursor", None)
+            count += len(my_pages["results"])
 
-# notion_helper.new_page_to_db(database_id, page_properties)
+            if limit is not None and count >= limit:
+                pages_json = pages_json[:limit]
+                break
 
-# # Assuming the page was created and you have its ID
-# page_id = "your_page_id"
+        return pages_json
 
-# blocks = [
-#     {
-#         "object": "block",
-#         "type": "paragraph",
-#         "paragraph": {
-#             "text": [
-#                 {
-#                     "type": "text",
-#                     "text": {
-#                         "content": "This is the first paragraph of text."
-#                     }
-#                 }
-#             ]
-#         }
-#     },
-#     {
-#         "object": "block",
-#         "type": "paragraph",
-#         "paragraph": {
-#             "text": [
-#                 {
-#                     "type": "text",
-#                     "text": {
-#                         "content": "This is the second paragraph of text."
-#                     }
-#                 }
-#             ]
-#         }
-#     }
-# ]
+    def get_all_pages_as_dataframe(self, database_id, limit=None):
+        """Returns a Pandas DataFrame representing all pages in the given database, with selected properties.
+           You can specify the number of entries to be loaded using the `limit` parameter.
+        """
 
-# notion_helper.append_page_body(page_id, blocks)
+        pages_json = self.get_all_pages_as_json(database_id, limit=limit)
+        data = []
+
+        # Define the list of allowed property types that we want to extract
+        allowed_properties = [
+            "title", "status", "number", "date", "url", "checkbox", "rich_text", "email", "select", "people", "phone_number", "multi_select", "created_time", "created_by", "rollup", "relation", "last_edited_by", "last_edited_time", "formula", "file"
+        ]
+
+        for page in pages_json:
+            row = {}
+            for key, value in page.items():
+                property_type = value.get("type", "")
+
+                if property_type in allowed_properties:
+                    if property_type == "title":
+                        row[key] = value.get("title", [{}])[0].get("plain_text", "")
+                    elif property_type == "status":
+                        row[key] = value.get("status", {}).get("name", "")
+                    elif property_type == "number":
+                        # Ensure number properties are explicitly cast to float
+                        number_value = value.get("number", None)
+                        row[key] = float(number_value) if isinstance(number_value, (int, float)) else None
+                    elif property_type == "date":
+                        date_field = value.get("date", {})
+                        row[key] = date_field.get("start", "") if date_field else ""
+                    elif property_type == "url":
+                        row[key] = value.get("url", "")
+                    elif property_type == "checkbox":
+                        row[key] = value.get("checkbox", False)
+                    elif property_type == "rich_text":
+                        rich_text_field = value.get("rich_text", [])
+                        row[key] = rich_text_field[0].get("plain_text", "") if rich_text_field else ""
+                    elif property_type == "email":
+                        row[key] = value.get("email", "")
+                    elif property_type == "select":
+                        select_field = value.get("select", {})
+                        row[key] = select_field.get("name", "") if select_field else ""
+                    elif property_type == "people":
+                        people_list = value.get("people", [])
+                        if people_list:
+                            person = people_list[0]
+                            row[key] = {
+                                "name": person.get("name", ""),
+                                "email": person.get("person", {}).get("email", "")
+                            }
+                    elif property_type == "phone_number":
+                        row[key] = value.get("phone_number", "")
+                    elif property_type == "multi_select":
+                        multi_select_field = value.get("multi_select", [])
+                        row[key] = [item.get("name", "") for item in multi_select_field]
+                    elif property_type == "created_time":
+                        row[key] = value.get("created_time", "")
+                    elif property_type == "created_by":
+                        created_by = value.get("created_by", {})
+                        row[key] = created_by.get("name", "")
+                    elif property_type == "rollup":
+                        rollup_field = value.get("rollup", {}).get("array", [])
+                        row[key] = [item.get("date", {}).get("start", "") for item in rollup_field]
+                    elif property_type == "relation":
+                        relation_list = value.get("relation", [])
+                        row[key] = [relation.get("id", "") for relation in relation_list]
+                    elif property_type == "last_edited_by":
+                        last_edited_by = value.get("last_edited_by", {})
+                        row[key] = last_edited_by.get("name", "")
+                    elif property_type == "last_edited_time":
+                        row[key] = value.get("last_edited_time", "")
+                    elif property_type == "formula":
+                        formula_value = value.get("formula", {})
+                        row[key] = formula_value.get(formula_value.get("type", ""), "")
+                    elif property_type == "file":
+                        files = value.get("files", [])
+                        row[key] = [file.get("name", "") for file in files]
+
+            data.append(row)
+
+        df = pd.DataFrame(data)
+        # Prevent numbers from displaying in scientific notation
+        pd.options.display.float_format = '{:.3f}'.format
+        return df

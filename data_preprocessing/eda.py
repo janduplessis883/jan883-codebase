@@ -728,7 +728,7 @@ def sample_df(df, n_samples):
         )
         return None
     else:
-        sampled_df = df.sample(n_samples, replace=True, random_state=42)
+        sampled_df = df.sample(n_samples, replace=False, random_state=42)
         print(f"Data Sampled: {sampled_df.shape}")
         return sampled_df
 
