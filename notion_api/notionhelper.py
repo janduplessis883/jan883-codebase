@@ -1,3 +1,4 @@
+import notion_client
 from notion_client import Client
 import pprint
 import pandas as pd

@@ -31,4 +31,4 @@ def open_links_from_file(file_path):
 # open_links_from_file('../data/links.txt')
 
 if __name__ == "__main__":
-    open_links_from_file("automation/streamlit_apps_links.txt")
+    open_links_from_file("streamlit_apps_links.txt")

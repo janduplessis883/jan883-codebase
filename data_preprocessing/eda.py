@@ -63,6 +63,8 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import StratifiedKFold, KFold
 from yellowbrick.model_selection import rfecv
 from sklearn.impute import SimpleImputer
+import pickle
+from scipy.stats import pearsonr
 
 
 warnings.filterwarnings("ignore")
@@ -103,6 +105,7 @@ def eda2():
 - IV / WOE Values - Information Value (IV) quantifies the prediction power of a feature. Short story is, we are looking for IV of 0.1 to 0.5. <0.1 weak, >0.5 to good to be true.<BR>
 - Feature Importance from Models<BR>
 - Statistical Tests<BR>
+- Create QQ Plots
 - Further Data Analysis on Imputed Data<BR>
 - scale_df(X) should be used in exploration as it does not scale X_test.<BR>
 - scale_X_train_X_test(X_train, X_test, scaler="standard", save_scaler=False) is a full scaler solution, scales X_test (fittransform) and saves the scaler to disk.<BR>
@@ -110,6 +113,8 @@ def eda2():
 - <code>newDF, woeDF = iv_woe(df, target, bins=10, show_woe=False)</code> Returns newDF, woeDF. IV / WOE Values - Information Value (IV) quantifies the prediction power of a feature. We are looking for IV of 0.1 to 0.5. For those with IV of 0, there is a high chance it is the way it is due to imbalance of data, resulting in lack of binning. Keep this in mind during further analysis.<BR>
 - <code>individual_t_test_classification(df, y_column, y_value_1, y_value_2, list_of_features, alpha_val=0.05, sample_frac=1.0, random_state=None)</code> Statistical test of individual features - Classification problem.<BR>
 - <code>individual_t_test_regression(df, y_column, list_of_features, alpha_val=0.05, sample_frac=1.0, random_state=None)</code> Statistical test of individual features - Regressions problem.<BR>
+- <code>create_qq_plots(df, reference_col)</code> Create QQ plots of the features in a dataframe.<BR>
+- <code>volcano_plot(df, reference_col)</code> Create Volcano Plot with P-value.<BR>
 - <code>X, y = define_X_y(df, target)</code> Define X and y..<BR>
 - <code>X_train, X_test, y_train, y_test = train_test_split_custom(X, y, test_size=0.2, random_state=42)</code> Split train, test.<BR>
 - <code>X_train, X_val, X_test, y_train, y_val, y_test = train_val_test_split(X, y, val_size=0.2, test_size=0.2, random_state=42)</code> Split train, val, test.<BR>
@@ -540,10 +545,12 @@ def scale_X_train_X_test(X_train, X_test, scaler="standard", save_scaler=False, 
     if save_scaler:
         # Generate a filename with a timestamp
         timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        scaler_filename = f'scaler_{scaler.__class__.__name__}_{timestamp}.pkl'
+        scaler_filename = f'scaler_{scaler.__class__.__name__}_{timestamp}'
 
         # Save the scaler to a file
-        joblib.dump(scaler, scaler_filename)
+        with open(f'{scaler_filename}.pkl', 'wb') as f:
+            pickle.dump(scaler, f)
+
         print(f"💾 Scaler saved to: {scaler_filename}")
 
     print(f"✅ scaled_X_train: fit_transform {scaler.__class__.__name__} - {scaled_X_train.shape}")
@@ -1549,3 +1556,111 @@ def impute_missing_values(df, strategy='mean'):
             df_imputed[column] = imputer.fit_transform(df_imputed[[column]])
 
     return df_imputed
+
+
+
+def create_qq_plots(df, reference_col):
+    """
+    Create QQ plots for all features in the DataFrame against a reference column.
+
+    Parameters:
+    df (pd.DataFrame): DataFrame containing the features and reference column.
+    reference_col (str): The column name of the reference variable (e.g., HbA1c).
+    """
+    # Ensure the reference column exists in the DataFrame
+    if reference_col not in df.columns:
+        raise ValueError(f"Reference column '{reference_col}' not found in DataFrame.")
+
+    # Loop through each feature column
+    for feature in df.columns:
+        if feature == reference_col:
+            continue
+
+        # Compute the p-value between the feature and reference column using Pearson correlation
+        try:
+            corr, p_value = pearsonr(df[feature], df[reference_col])
+        except Exception as e:
+            print(f"Error computing p-value for {feature}: {e}")
+            continue
+
+        # Prepare observed and expected p-values for the QQ plot
+        observed_p = [p_value]
+        sorted_p = np.sort(observed_p)
+        expected = np.linspace(1 / len(sorted_p), 1, len(sorted_p))
+
+        # Generate the QQ plot
+        plt.figure(figsize=(6, 5))
+        plt.scatter(-np.log10(expected), -np.log10(sorted_p), color="blue", alpha=0.6, label=f"Observed P-value: {p_value:.4f}")
+        plt.plot([0, -np.log10(expected[-1])], [0, -np.log10(expected[-1])], color="red", linestyle="--", label="Expected = Observed")
+        plt.title(f"QQ Plot: {feature} vs {reference_col}")
+        plt.xlabel("Expected -log10(P)")
+        plt.ylabel("Observed -log10(P)")
+        plt.legend()
+        plt.grid(alpha=0.3)
+        plt.show()
+
+
+def volcano_plot(df, reference_col):
+    """
+    Create a volcano plot of p-values and effect sizes for features in a DataFrame against a reference column.
+
+    Parameters:
+    df (pd.DataFrame): DataFrame containing features and a reference column.
+    reference_col (str): The column name of the reference variable (e.g., HbA1c).
+    """
+    # Ensure the reference column exists in the DataFrame
+    if reference_col not in df.columns:
+        raise ValueError(f"Reference column '{reference_col}' not found in DataFrame.")
+
+    p_values = []
+    effect_sizes = []
+    features = []
+
+    # Loop through each feature column
+    for feature in df.columns:
+        if feature == reference_col:
+            continue
+
+        try:
+            # Calculate Pearson correlation and p-value
+            corr, p_value = pearsonr(df[feature], df[reference_col])
+
+            # Store the feature name, p-value, and effect size (correlation as a proxy for effect size)
+            features.append(feature)
+            p_values.append(p_value)
+            effect_sizes.append(corr)
+        except Exception as e:
+            print(f"Error processing {feature}: {e}")
+            continue
+
+    # Convert results to a DataFrame for plotting
+    results_df = pd.DataFrame({
+        "feature": features,
+        "p_value": p_values,
+        "effect_size": effect_sizes
+    })
+
+    # Add a significance threshold (commonly p = 0.05)
+    significance_threshold = 0.05
+
+    # Plot the volcano plot
+    plt.figure(figsize=(10, 6))
+    plt.scatter(
+        results_df["effect_size"],
+        -np.log10(results_df["p_value"]),
+        color="blue", alpha=0.7, label="Features"
+    )
+    plt.axhline(-np.log10(significance_threshold), color="red", linestyle="--", label="P = 0.05")
+    plt.axvline(0, color="gray", linestyle="--", label="No Effect")
+    plt.title("Volcano Plot")
+    plt.xlabel("Effect Size (Correlation Coefficient)")
+    plt.ylabel("-log10(P-Value)")
+    plt.legend()
+    plt.grid(alpha=0.3)
+
+    # Annotate significant features
+    significant_features = results_df[results_df["p_value"] < significance_threshold]
+    for _, row in significant_features.iterrows():
+        plt.text(row["effect_size"], -np.log10(row["p_value"]), row["feature"], fontsize=8)
+
+    plt.show()

@@ -13,13 +13,12 @@ current_time = datetime.now()
 
 
 def main():
-    # Setup the Open-Meteo API client with cache and retry on error
+    # Setup Open-Meteo API client with cache and retry on error
     cache_session = requests_cache.CachedSession(".cache", expire_after=3600)
     retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
 
-    # Make sure all required weather variables are listed here
-    # The order of variables in hourly or daily is important to assign them correctly below
+    # Weather API parameters
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": 51.5085,
@@ -36,67 +35,43 @@ def main():
     }
     responses = openmeteo.weather_api(url, params=params)
 
-    # Process first location. Add a for-loop for multiple locations or weather models
+    # Process first location
     response = responses[0]
+    logger.info(f"API Response: {response}")
     print(f"Coordinates {response.Latitude()}°N {response.Longitude()}°E")
     print(f"Elevation {response.Elevation()} m asl")
     print(f"Timezone {response.Timezone()} {response.TimezoneAbbreviation()}")
     print(f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s")
 
-    # Process hourly data. The order of variables needs to be the same as requested.
+    # Process hourly data
     hourly = response.Hourly()
-    hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
-    hourly_apparent_temperature = hourly.Variables(1).ValuesAsNumpy()
-    hourly_rain = hourly.Variables(2).ValuesAsNumpy()
-    hourly_cloud_cover = hourly.Variables(3).ValuesAsNumpy()
-    hourly_cloud_cover_low = hourly.Variables(4).ValuesAsNumpy()
-    hourly_cloud_cover_mid = hourly.Variables(5).ValuesAsNumpy()
-    hourly_cloud_cover_high = hourly.Variables(6).ValuesAsNumpy()
-
     hourly_data = {
         "date": pd.date_range(
             start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
             end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
             freq=pd.Timedelta(seconds=hourly.Interval()),
             inclusive="left",
-        )
+        ),
+        "temperature_2m": hourly.Variables(0).ValuesAsNumpy(),
+        "apparent_temperature": hourly.Variables(1).ValuesAsNumpy(),
+        "rain": hourly.Variables(2).ValuesAsNumpy(),
+        "cloud_cover": hourly.Variables(3).ValuesAsNumpy(),
     }
-    hourly_data["temperature_2m"] = hourly_temperature_2m
-    hourly_data["apparent_temperature"] = hourly_apparent_temperature
-    hourly_data["rain"] = hourly_rain
-    hourly_data["cloud_cover"] = hourly_cloud_cover
-    hourly_data["cloud_cover_low"] = hourly_cloud_cover_low
-    hourly_data["cloud_cover_mid"] = hourly_cloud_cover_mid
-    hourly_data["cloud_cover_high"] = hourly_cloud_cover_high
+    hourly_dataframe = pd.DataFrame(hourly_data)
 
-    hourly_dataframe = pd.DataFrame(data=hourly_data)
+    # Clean data before plotting
+    hourly_dataframe.replace([float('inf'), float('-inf')], pd.NA, inplace=True)
+    hourly_dataframe.dropna(inplace=True)
 
+    # Plotting
     import matplotlib.pyplot as plt
     import seaborn as sns
 
     fig, ax = plt.subplots(figsize=(12, 5))
-    sns.lineplot(
-        data=hourly_dataframe,
-        x="date",
-        y="temperature_2m",
-        color="#d95442",
-        linewidth=3,
-    )
-    sns.lineplot(
-        data=hourly_dataframe,
-        x="date",
-        y="apparent_temperature",
-        color="#d7d8d7",
-        linewidth=2,
-    )
+    sns.lineplot(data=hourly_dataframe, x="date", y="temperature_2m", color="#d95442")
+    sns.lineplot(data=hourly_dataframe, x="date", y="apparent_temperature", color="#d7d8d7")
     sns.lineplot(data=hourly_dataframe, x="date", y="rain", color="#50b2d4")
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_visible(False)
-    ax.yaxis.grid(True, linestyle="--", linewidth=0.5, color="#888888")
-    ax.xaxis.grid(False)
-    plt.title(f"7-Day Forcast London - Temp+Rain - {current_time}")
-    plt.savefig("log/7dayforcast.png")
+    plt.savefig("log/7dayforecast.png")
     logger.info("Saved Image File. -  TEMP")
 
     fig, ax = plt.subplots(figsize=(12, 5))

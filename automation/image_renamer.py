@@ -52,7 +52,7 @@ if proceed == "y" or proceed == "Y":
 
         # Define the data payload as a JSON object
         data_payload = {
-            "model": "llava",
+            "model": "llava-llama3",
             "prompt": "based on the content of the image suggest an appropriate file name for the image, only return the file name, without the file extention",
             "images": [base64_image],
             "stream": False,
