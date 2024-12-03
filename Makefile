@@ -36,7 +36,7 @@ scheduler:
 news_scheduler:
 	@python automation/daily_scheduler.py
 
-organize_folders:
+sort_downloads:
 	@python automation/organize_files.py
 
 git_merge:

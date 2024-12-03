@@ -31,7 +31,8 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from yellowbrick.regressor import ResidualsPlot, PredictionError
 from yellowbrick.classifier import DiscriminationThreshold, PrecisionRecallCurve
-from imblearn.over_sampling import SMOTE
+# from imblearn.over_sampling import SMOTE
+
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 import joblib
 from datetime import datetime
@@ -114,7 +115,7 @@ def eda2():
 - <code>individual_t_test_classification(df, y_column, y_value_1, y_value_2, list_of_features, alpha_val=0.05, sample_frac=1.0, random_state=None)</code> Statistical test of individual features - Classification problem.<BR>
 - <code>individual_t_test_regression(df, y_column, list_of_features, alpha_val=0.05, sample_frac=1.0, random_state=None)</code> Statistical test of individual features - Regressions problem.<BR>
 - <code>create_qq_plots(df, reference_col)</code> Create QQ plots of the features in a dataframe.<BR>
-- <code>volcano_plot(df, reference_col)</code> Create Volcano Plot with P-value.<BR>
+- <code>volcano_plot(df, reference_col)</code> Create Volcano Plot with P-values.<BR>
 - <code>X, y = define_X_y(df, target)</code> Define X and y..<BR>
 - <code>X_train, X_test, y_train, y_test = train_test_split_custom(X, y, test_size=0.2, random_state=42)</code> Split train, test.<BR>
 - <code>X_train, X_val, X_test, y_train, y_val, y_test = train_val_test_split(X, y, val_size=0.2, test_size=0.2, random_state=42)</code> Split train, val, test.<BR>
@@ -1600,6 +1601,8 @@ def create_qq_plots(df, reference_col):
         plt.show()
 
 
+
+
 def volcano_plot(df, reference_col):
     """
     Create a volcano plot of p-values and effect sizes for features in a DataFrame against a reference column.
@@ -1622,15 +1625,18 @@ def volcano_plot(df, reference_col):
             continue
 
         try:
+            # Drop rows with NaN values in the current feature and reference column
+            df_clean = df[[feature, reference_col]].dropna()
+
             # Calculate Pearson correlation and p-value
-            corr, p_value = pearsonr(df[feature], df[reference_col])
+            corr, p_value = pearsonr(df_clean[feature], df_clean[reference_col])
 
             # Store the feature name, p-value, and effect size (correlation as a proxy for effect size)
             features.append(feature)
             p_values.append(p_value)
             effect_sizes.append(corr)
-        except Exception as e:
-            print(f"Error processing {feature}: {e}")
+        except ValueError as e:
+            print(f"Skipping {feature}: {e}")
             continue
 
     # Convert results to a DataFrame for plotting
@@ -1640,8 +1646,8 @@ def volcano_plot(df, reference_col):
         "effect_size": effect_sizes
     })
 
-    # Add a significance threshold (commonly p = 0.05)
-    significance_threshold = 0.05
+    # Adjust significance threshold for multiple comparisons (Bonferroni correction)
+    significance_threshold = 0.05 / len(features) if features else 0.05
 
     # Plot the volcano plot
     plt.figure(figsize=(10, 6))
@@ -1650,7 +1656,7 @@ def volcano_plot(df, reference_col):
         -np.log10(results_df["p_value"]),
         color="blue", alpha=0.7, label="Features"
     )
-    plt.axhline(-np.log10(significance_threshold), color="red", linestyle="--", label="P = 0.05")
+    plt.axhline(-np.log10(significance_threshold), color="red", linestyle="--", label=f"P = {significance_threshold:.2e}")
     plt.axvline(0, color="gray", linestyle="--", label="No Effect")
     plt.title("Volcano Plot")
     plt.xlabel("Effect Size (Correlation Coefficient)")
@@ -1661,6 +1667,12 @@ def volcano_plot(df, reference_col):
     # Annotate significant features
     significant_features = results_df[results_df["p_value"] < significance_threshold]
     for _, row in significant_features.iterrows():
-        plt.text(row["effect_size"], -np.log10(row["p_value"]), row["feature"], fontsize=8)
+        plt.text(
+            row["effect_size"],
+            -np.log10(row["p_value"]) + 0.1,  # Offset the text slightly to avoid overlap
+            row["feature"],
+            fontsize=8,
+            ha='center'
+        )
 
     plt.show()

@@ -145,6 +145,7 @@ def remove_repeated_blocks_using_simhash(blocks):
 
     for block in blocks:
         block_hash = Simhash(block).value
+        print(block_hash)
         if block_hash not in seen_hashes:
             cleaned_blocks.append(block)
             seen_hashes.add(block_hash)
