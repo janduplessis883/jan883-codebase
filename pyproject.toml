@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jan883_codebase"
+version = "0.1.0"
+description = "Personal codebase for data science and machine learning projects. Includes data preprocessing, feature engineering, model selection, and model evaluation."
+authors = [
+    { name = "Jan du Plessis", email = "drjanduplessis@icloud.com" }
+]
+license = { file = "LICENSE" }
+dependencies = [
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "seaborn",
+    "scipy",
+    "scikit-learn",
+    "xgboost",
+    "yellowbrick",
+    "imbalanced-learn",
+    "tqdm",
+    "joblib",
+    "ipython",
+    "notion-client",
+    "mistune==2.0.4",
+    "click",
+    "colorama",
+    "loguru",
+    "requests",
+    "crewai",
+    "crewai_tools"
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",  # Code formatting
+    "pytest",  # Testing framework
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = ["jan883_codebase"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+skip-string-normalization = true
