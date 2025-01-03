@@ -7,32 +7,44 @@ import os
 # NotionHelper can be used in conjunction with the Streamlit APP: (Notion API JSON)[https://notioinapiassistant.streamlit.app]
 
 class NotionHelper:
-    """
-    Class NotionHelper
-    ------------------
-    A class to assist in interfacing with the Notion API.
+        '''
+        A helper class to interact with the Notion API.
 
-    Methods:
-    - __init__(self): Initializes an instance of the class and invokes the authenticate method.
-    - authenticate(self): Sets the `notion_token` property equal to the `ac.notion_api_key` and creates a `Client` instance with the `notion_token` property to be used for queries.
-    - notion_search_db(self, database_id='e18e2d110f9e401eb1adf3190e51a21b', query=''): Queries a Notion database and returns the page title and url of the result(s) page. If there are multiple results, pprint module is used to pretty print the results.
-    - notion_get_page(self, page_id): Retrieves a Notion page and returns the heading and an array of blocks on that page.
-    - create_database(self, parent_page_id, database_title, properties): Creates a new database in Notion.
-    - new_page_to_db(self, database_id, page_properties): Adds a new page to a Notion database.
-    - append_page_body(self, page_id, blocks): Appends blocks of text to the body of a Notion page.
-    - get_all_page_ids(self, database_id): Returns the IDs of all pages in a given database.
-    - get_all_pages_as_json(self, database_id): Returns a list of JSON objects representing all pages in the given database, with all properties.
+        Methods
+        -------
+        __init__():
+            Initializes the NotionHelper instance and authenticates with the Notion API.
 
-    Usage:
-    - Instantiate a `NotionHelper` object.
-    - Call the `notion_search_db` method to search for pages in a Notion database.
-    - Call the `notion_get_page` method to retrieve a page and its blocks.
-    - Call the `create_database` method to create a new database in Notion.
-    - Call the `new_page_to_db` method to add a new page to a Notion database.
-    - Call the `append_page_body` method to append blocks of text to a Notion page.
-    - Call the `get_all_page_ids` method to get the IDs of all pages in a database.
-    - Call the `get_all_pages_as_json` method to get all pages as JSON objects.
-    """
+        authenticate():
+            Authenticates with the Notion API using a token from environment variables.
+
+        get_database(database_id):
+            Fetches the schema of a Notion database given its database_id.
+
+        notion_search_db(database_id, query=""):
+            Searches for pages in a Notion database that contain the specified query in their title.
+
+        notion_get_page(page_id):
+            Returns the JSON of the page properties and an array of blocks on a Notion page given its page_id.
+
+        create_database(parent_page_id, database_title, properties):
+            Creates a new database in Notion under the specified parent page with the given title and properties.
+
+        new_page_to_db(database_id, page_properties):
+            Adds a new page to a Notion database with the specified properties.
+
+        append_page_body(page_id, blocks):
+            Appends blocks of text to the body of a Notion page.
+
+        get_all_page_ids(database_id):
+            Returns the IDs of all pages in a given Notion database.
+
+        get_all_pages_as_json(database_id, limit=None):
+            Returns a list of JSON objects representing all pages in the given database, with all properties.
+
+        get_all_pages_as_dataframe(database_id, limit=None):
+            Returns a Pandas DataFrame representing all pages in the given database, with selected properties.
+        '''
 
     def __init__(self):
         self.authenticate()

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jan883_codebase"
-version = "0.1.0"
+version = "0.1.1"
 description = "Personal codebase for data science and machine learning projects. Includes data preprocessing, feature engineering, model selection, and model evaluation."
 readme = "README.md"
 authors = [
@@ -28,11 +28,11 @@ classifiers = [
 ]
 keywords = ["data science", "machine learning", "utilities", "EDA", "modeling"]
 dependencies = [
-    "numpy>=1.21.0",
-    "pandas>=1.3.0",
-    "scikit-learn>=1.0.0",
-    "matplotlib>=3.5.0",
-    "seaborn>=0.11.0",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
     "scipy",
     "xgboost",
     "yellowbrick",
