@@ -41,7 +41,6 @@ dependencies = [
     "joblib",
     "ipython",
     "notion-client",
-    "mistune==2.0.4",
     "click",
     "colorama",
     "loguru",

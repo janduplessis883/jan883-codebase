@@ -1,5 +1,5 @@
 # **jan883-codebase** - Data Science Collection
-![jan883_codebase logo](images/logo2.png)
+![jan883_codebase logo](https://github.com/janduplessis883/jan883-codebase/blob/master/images/logo2.png?raw=true)
 
 This repository contains a collection of Python functions designed to streamline Exploratory Data Analysis (EDA) and model selection processes. The toolkit is divided into three main sections: **EDA Level 1**, **EDA Level 2**, **Model Selection** and a selection of other tools lick **NotionHelper**, helper class for the Official Notio API via `notion-client` each providing a set of utility functions to assist in data transformation, analysis, and model evaluation.
 
