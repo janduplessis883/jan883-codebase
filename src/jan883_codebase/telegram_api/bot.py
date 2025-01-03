@@ -1,8 +1,9 @@
 import requests
 import os
 
-telegram_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-chat_id = os.getenv('CHAT_ID')
+telegram_bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+chat_id = os.getenv("CHAT_ID")
+
 
 def telegram_send(bot_message, chat_id=chat_id):
     send_text = "https://api.telegram.org/bot" + telegram_bot_token + "/sendMessage"
@@ -20,19 +21,18 @@ def telegram_send(bot_message, chat_id=chat_id):
 def telegram_send_image(image_path, chat_id=chat_id, caption=None):
     send_photo_url = f"https://api.telegram.org/bot{telegram_bot_token}/sendPhoto"
 
-    with open(image_path, 'rb') as image_file:
-        files = {'photo': image_file}
-        data = {
-            'chat_id': chat_id,
-            'caption': caption
-        }
+    with open(image_path, "rb") as image_file:
+        files = {"photo": image_file}
+        data = {"chat_id": chat_id, "caption": caption}
         response = requests.post(send_photo_url, files=files, data=data)
 
     return response.json()
 
+
 # Example usage:
 # response = telegram_send_image("path_to_your_image.jpg", caption="Here is your image!")
 # print(response)
+
 
 def telegram_send_video(video_path, chat_id=chat_id, caption=None, timeout=10):
     """
@@ -46,13 +46,12 @@ def telegram_send_video(video_path, chat_id=chat_id, caption=None, timeout=10):
     send_video_url = f"https://api.telegram.org/bot{telegram_bot_token}/sendVideo"
 
     try:
-        with open(video_path, 'rb') as video_file:
-            files = {'video': video_file}
-            data = {
-                'chat_id': chat_id,
-                'caption': caption
-            }
-            response = requests.post(send_video_url, files=files, data=data, timeout=timeout)
+        with open(video_path, "rb") as video_file:
+            files = {"video": video_file}
+            data = {"chat_id": chat_id, "caption": caption}
+            response = requests.post(
+                send_video_url, files=files, data=data, timeout=timeout
+            )
             response.raise_for_status()  # Raise an error for bad responses
             return response.json()
 
@@ -76,13 +75,12 @@ def telegram_send_document(document_path, chat_id=chat_id, caption=None, timeout
     send_document_url = f"https://api.telegram.org/bot{telegram_bot_token}/sendDocument"
 
     try:
-        with open(document_path, 'rb') as document_file:
-            files = {'document': document_file}
-            data = {
-                'chat_id': chat_id,
-                'caption': caption
-            }
-            response = requests.post(send_document_url, files=files, data=data, timeout=timeout)
+        with open(document_path, "rb") as document_file:
+            files = {"document": document_file}
+            data = {"chat_id": chat_id, "caption": caption}
+            response = requests.post(
+                send_document_url, files=files, data=data, timeout=timeout
+            )
             response.raise_for_status()  # Raise an error for bad responses
             return response.json()
 

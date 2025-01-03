@@ -1,6 +1,7 @@
 """
 This module contains implementations of various retriever models for document retrieval.
 """
+
 from typing import Callable
 
 import bm25s

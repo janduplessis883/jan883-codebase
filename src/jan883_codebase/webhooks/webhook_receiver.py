@@ -11,7 +11,8 @@ client = contiguity.login("your_token_here", True)
 
 app = Flask(__name__)
 
-@app.route('/webhook', methods=['POST'])
+
+@app.route("/webhook", methods=["POST"])
 def webhook():
     """
     Webhook receiver that captures and processes the date field.
@@ -24,7 +25,7 @@ def webhook():
         print("Webhook received:", data)
 
         # Capture the date field from the payload
-        date_str = data.get('date')  # Example: "2024-12-06T14:30:00Z"
+        date_str = data.get("date")  # Example: "2024-12-06T14:30:00Z"
 
         if date_str:
             # Convert the date string to a Python datetime object
@@ -34,11 +35,21 @@ def webhook():
             print("Date field is missing in the webhook payload.")
 
         # Respond with a success message
-        return jsonify({'status': 'success', 'message': 'Webhook received!', 'captured_date': date_str}), 200
+        return (
+            jsonify(
+                {
+                    "status": "success",
+                    "message": "Webhook received!",
+                    "captured_date": date_str,
+                }
+            ),
+            200,
+        )
 
     except Exception as e:
         print(f"Error: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5020, debug=True)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5020, debug=True)

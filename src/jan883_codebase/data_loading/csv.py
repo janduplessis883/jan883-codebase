@@ -5,6 +5,7 @@ from tqdm import tqdm
 
 tqdm.pandas()
 
+
 def list_csv_files(directory):
     """
     Return all files in the given directory with a .csv extension.
@@ -23,7 +24,6 @@ def list_csv_files(directory):
     csv_files = glob.glob(os.path.join(directory, "*.csv"))
 
     return csv_files
-
 
 
 def load_csv_files_into_dict(directory):
@@ -46,22 +46,26 @@ def load_csv_files_into_dict(directory):
     # Loop through each file and load it into a DataFrame
     for csv_file in tqdm(csv_files, "Loading csv to dataframe", total=len(csv_files)):
         # Extract the base filename without the directory and extension
-        file_name = os.path.basename(csv_file).replace('.csv', '')
+        file_name = os.path.basename(csv_file).replace(".csv", "")
     # Loop through each file and load it into a DataFrame
     for csv_file in csv_files:
         # Extract the base filename without the directory and extension
-        file_name = os.path.basename(csv_file).replace('.csv', '')
+        file_name = os.path.basename(csv_file).replace(".csv", "")
 
         # Attempt to load the CSV with UTF-8 encoding
         try:
-            df = pd.read_csv(csv_file, encoding='utf-8')
+            df = pd.read_csv(csv_file, encoding="utf-8")
         except UnicodeDecodeError:
-            print(f"Error reading {csv_file} with UTF-8 encoding, trying with ISO-8859-1 (latin1) encoding.")
+            print(
+                f"Error reading {csv_file} with UTF-8 encoding, trying with ISO-8859-1 (latin1) encoding."
+            )
             # If UTF-8 fails, try reading with 'ISO-8859-1' encoding
             try:
-                df = pd.read_csv(csv_file, encoding='ISO-8859-1')
+                df = pd.read_csv(csv_file, encoding="ISO-8859-1")
             except Exception as e:
-                print(f"Failed to load {csv_file} with ISO-8859-1 encoding as well. Skipping file. Error: {e}")
+                print(
+                    f"Failed to load {csv_file} with ISO-8859-1 encoding as well. Skipping file. Error: {e}"
+                )
                 continue  # Skip this file and move on to the next
 
         # Add the DataFrame to the dictionary with the filename as the key

@@ -1,6 +1,7 @@
 """
 Utility functions for the RAG notebooks.
 """
+
 import inspect
 import os
 import re

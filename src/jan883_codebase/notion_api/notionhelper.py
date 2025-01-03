@@ -142,7 +142,7 @@ class NotionHelper:
 
     def get_all_pages_as_json(self, database_id, limit=None):
         """Returns a list of JSON objects representing all pages in the given database, with all properties.
-           You can specify the number of entries to be loaded using the `limit` parameter.
+        You can specify the number of entries to be loaded using the `limit` parameter.
         """
 
         # Use pagination to remove any limits on number of entries, optionally limited by `limit` argument
@@ -171,7 +171,7 @@ class NotionHelper:
 
     def get_all_pages_as_dataframe(self, database_id, limit=None):
         """Returns a Pandas DataFrame representing all pages in the given database, with selected properties.
-           You can specify the number of entries to be loaded using the `limit` parameter.
+        You can specify the number of entries to be loaded using the `limit` parameter.
         """
 
         pages_json = self.get_all_pages_as_json(database_id, limit=limit)
@@ -179,7 +179,26 @@ class NotionHelper:
 
         # Define the list of allowed property types that we want to extract
         allowed_properties = [
-            "title", "status", "number", "date", "url", "checkbox", "rich_text", "email", "select", "people", "phone_number", "multi_select", "created_time", "created_by", "rollup", "relation", "last_edited_by", "last_edited_time", "formula", "file"
+            "title",
+            "status",
+            "number",
+            "date",
+            "url",
+            "checkbox",
+            "rich_text",
+            "email",
+            "select",
+            "people",
+            "phone_number",
+            "multi_select",
+            "created_time",
+            "created_by",
+            "rollup",
+            "relation",
+            "last_edited_by",
+            "last_edited_time",
+            "formula",
+            "file",
         ]
 
         for page in pages_json:
@@ -195,7 +214,11 @@ class NotionHelper:
                     elif property_type == "number":
                         # Ensure number properties are explicitly cast to float
                         number_value = value.get("number", None)
-                        row[key] = float(number_value) if isinstance(number_value, (int, float)) else None
+                        row[key] = (
+                            float(number_value)
+                            if isinstance(number_value, (int, float))
+                            else None
+                        )
                     elif property_type == "date":
                         date_field = value.get("date", {})
                         row[key] = date_field.get("start", "") if date_field else ""
@@ -205,7 +228,11 @@ class NotionHelper:
                         row[key] = value.get("checkbox", False)
                     elif property_type == "rich_text":
                         rich_text_field = value.get("rich_text", [])
-                        row[key] = rich_text_field[0].get("plain_text", "") if rich_text_field else ""
+                        row[key] = (
+                            rich_text_field[0].get("plain_text", "")
+                            if rich_text_field
+                            else ""
+                        )
                     elif property_type == "email":
                         row[key] = value.get("email", "")
                     elif property_type == "select":
@@ -217,7 +244,7 @@ class NotionHelper:
                             person = people_list[0]
                             row[key] = {
                                 "name": person.get("name", ""),
-                                "email": person.get("person", {}).get("email", "")
+                                "email": person.get("person", {}).get("email", ""),
                             }
                     elif property_type == "phone_number":
                         row[key] = value.get("phone_number", "")
@@ -231,10 +258,15 @@ class NotionHelper:
                         row[key] = created_by.get("name", "")
                     elif property_type == "rollup":
                         rollup_field = value.get("rollup", {}).get("array", [])
-                        row[key] = [item.get("date", {}).get("start", "") for item in rollup_field]
+                        row[key] = [
+                            item.get("date", {}).get("start", "")
+                            for item in rollup_field
+                        ]
                     elif property_type == "relation":
                         relation_list = value.get("relation", [])
-                        row[key] = [relation.get("id", "") for relation in relation_list]
+                        row[key] = [
+                            relation.get("id", "") for relation in relation_list
+                        ]
                     elif property_type == "last_edited_by":
                         last_edited_by = value.get("last_edited_by", {})
                         row[key] = last_edited_by.get("name", "")
@@ -251,5 +283,5 @@ class NotionHelper:
 
         df = pd.DataFrame(data)
         # Prevent numbers from displaying in scientific notation
-        pd.options.display.float_format = '{:.3f}'.format
+        pd.options.display.float_format = "{:.3f}".format
         return df

@@ -1,6 +1,7 @@
 import os
 import shutil
 
+
 def organize_files_by_extension(directory):
     print(f"\n🅾️ - Organizing: {directory}\n")
     # List all files in the specified directory
@@ -28,10 +29,8 @@ def organize_files_by_extension(directory):
                 print(f"↪️ - Moved: {filename} -> {extension}/")
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Specify the path to your Downloads folder
-    downloads_path = '/Users/janduplessis/Downloads/'
+    downloads_path = "/Users/janduplessis/Downloads/"
     # Call the function to organize files by extension
     organize_files_by_extension(downloads_path)

@@ -1,14 +1,24 @@
 import requests
 import json
 
+
 # %%
-def ask_ollama(user_prompt, system_prompt="You are a helpful AI assistant.", model="llama3.1", format="plain text", temp=0, max_tokens=0):
+def ask_ollama(
+    user_prompt,
+    system_prompt="You are a helpful AI assistant.",
+    model="llama3.1",
+    format="plain text",
+    temp=0,
+    max_tokens=0,
+):
     """
     import the following for function to work:
     from helper883 import *
     """
 
-    output_format = f"PLEASE MAKE SURE YOUR OUTPUT IS IN THE FOLLOWING FORMAT: {format}."
+    output_format = (
+        f"PLEASE MAKE SURE YOUR OUTPUT IS IN THE FOLLOWING FORMAT: {format}."
+    )
     # Define the endpoint URL and headers
     url = "http://localhost:11434/api/generate"  # Update the URL to match your server's endpoint
     headers = {
@@ -23,8 +33,8 @@ def ask_ollama(user_prompt, system_prompt="You are a helpful AI assistant.", mod
         "max_tokens": max_tokens,
         "stream": False,
         "options": {
-                "temperature": temp,
-                },
+            "temperature": temp,
+        },
     }
 
     # Make the POST request
@@ -38,7 +48,10 @@ def ask_ollama(user_prompt, system_prompt="You are a helpful AI assistant.", mod
         print("Error:", response.status_code, response.text)
         return False
 
-def mini_check_ollama(document=None, claim=None, model="bespoke-minicheck:latest", format="text", temp="0"):
+
+def mini_check_ollama(
+    document=None, claim=None, model="bespoke-minicheck:latest", format="text", temp="0"
+):
     """
     Miniature fact-checking tool using Hugging Face's Transformers.
 
@@ -60,11 +73,15 @@ def mini_check_ollama(document=None, claim=None, model="bespoke-minicheck:latest
     Raises:
         Exception: If there is an error with the API request.
     """
-    print("Bespoke-MiniCheck\nThe model takes as input a document (text) and a sentence and determines whether the sentence is supported by the document. In order to fact-check a multi-sentence claim, the claim should first be broken up into sentences. The document does not need to be chunked unless it exceeds 32K tokens.\n")
+    print(
+        "Bespoke-MiniCheck\nThe model takes as input a document (text) and a sentence and determines whether the sentence is supported by the document. In order to fact-check a multi-sentence claim, the claim should first be broken up into sentences. The document does not need to be chunked unless it exceeds 32K tokens.\n"
+    )
 
     if document == None and claim == None:
         document = input("📑 Document: (The text to examine) ")
-        claim = input("😥 Claim: (Determines if the sentence is supported by the document) ")
+        claim = input(
+            "😥 Claim: (Determines if the sentence is supported by the document) "
+        )
 
     # Define the endpoint URL and headers
     url = "http://localhost:11434/api/generate"  # Update the URL to match your server's endpoint
@@ -91,6 +108,7 @@ def mini_check_ollama(document=None, claim=None, model="bespoke-minicheck:latest
     else:
         print("Error:", response.status_code, response.text)
         return False
+
 
 # USING THE BESPOKE API
 # import os

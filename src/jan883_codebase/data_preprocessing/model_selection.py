@@ -20,7 +20,13 @@ from sklearn.metrics import (
     auc,
     RocCurveDisplay,
 )
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+)
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from yellowbrick.regressor import ResidualsPlot, PredictionError
 from yellowbrick.classifier import DiscriminationThreshold, PrecisionRecallCurve
@@ -31,7 +37,11 @@ from datetime import datetime
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor
+from sklearn.ensemble import (
+    RandomForestRegressor,
+    GradientBoostingRegressor,
+    AdaBoostRegressor,
+)
 from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neural_network import MLPRegressor
@@ -39,7 +49,11 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
+from sklearn.ensemble import (
+    RandomForestClassifier,
+    GradientBoostingClassifier,
+    AdaBoostClassifier,
+)
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -48,6 +62,7 @@ from tqdm import tqdm
 from IPython.display import HTML, Markdown, display
 
 warnings.filterwarnings("ignore")
+
 
 def ml0():
     message = """<b>Model Selection — Choosing the right Model.</b> <BR>
@@ -69,45 +84,57 @@ def ml0():
     display(HTML(html_message))
 
 
-
 def feature_importance_comparison(X_train, y_train):
-    def feature_importance_sorted(classification_model_input, X_train, y_train, feature_importance_input=None):
+    def feature_importance_sorted(
+        classification_model_input, X_train, y_train, feature_importance_input=None
+    ):
         if classification_model_input is not None:
             some_model = classification_model_input
             some_model.fit(X_train, y_train)
             feature_importances = some_model.feature_importances_
         else:
             feature_importances = feature_importance_input
-        feature_importances_sorted = sorted(zip(X_train.columns, feature_importances), key=lambda x: x[1], reverse=True)
-        df_feature_importances = pd.DataFrame(feature_importances_sorted, columns=['Feature', 'Importance'])
-        df_feature_importances['rank'] = range(1, len(df_feature_importances)+1)
+        feature_importances_sorted = sorted(
+            zip(X_train.columns, feature_importances), key=lambda x: x[1], reverse=True
+        )
+        df_feature_importances = pd.DataFrame(
+            feature_importances_sorted, columns=["Feature", "Importance"]
+        )
+        df_feature_importances["rank"] = range(1, len(df_feature_importances) + 1)
         return df_feature_importances
 
     # Decision Tree Classifier Feature Importance
     dtc_fi = feature_importance_sorted(DecisionTreeClassifier(), X_train, y_train)
-    dtc_fi = dtc_fi.rename(columns={'Importance': 'imp_dtc', 'rank': 'rank_dtc'})
+    dtc_fi = dtc_fi.rename(columns={"Importance": "imp_dtc", "rank": "rank_dtc"})
 
     # Random Forest Classifier Feature Importance
-    rfc_fi = feature_importance_sorted(RandomForestClassifier(), X_train, y_train.values.ravel())
-    rfc_fi = rfc_fi.rename(columns={'Importance': 'imp_rfc', 'rank': 'rank_rfc'})
+    rfc_fi = feature_importance_sorted(
+        RandomForestClassifier(), X_train, y_train.values.ravel()
+    )
+    rfc_fi = rfc_fi.rename(columns={"Importance": "imp_rfc", "rank": "rank_rfc"})
 
     # XGB Classifier Feature Importance
     xgb_fi = feature_importance_sorted(xgb.XGBClassifier(), X_train, y_train)
-    xgb_fi = xgb_fi.rename(columns={'Importance': 'imp_xgb', 'rank': 'rank_xgb'})
+    xgb_fi = xgb_fi.rename(columns={"Importance": "imp_xgb", "rank": "rank_xgb"})
 
     # Logistic Regression Feature Importance
     lr = LogisticRegression(max_iter=10000)
     lr.fit(X_train, y_train.values.ravel())
     feature_importances = lr.coef_[0]  # Assuming binary classification
-    lr_fi = feature_importance_sorted(None, X_train, y_train.values.ravel(), feature_importances)
-    lr_fi = lr_fi.rename(columns={'Importance': 'imp_lr', 'rank': 'rank_lr'})
+    lr_fi = feature_importance_sorted(
+        None, X_train, y_train.values.ravel(), feature_importances
+    )
+    lr_fi = lr_fi.rename(columns={"Importance": "imp_lr", "rank": "rank_lr"})
 
     # Merge the results from all models
-    merged_df = dtc_fi.merge(rfc_fi, on='Feature', how='left')\
-                      .merge(xgb_fi, on='Feature', how='left')\
-                      .merge(lr_fi, on='Feature', how='left')
+    merged_df = (
+        dtc_fi.merge(rfc_fi, on="Feature", how="left")
+        .merge(xgb_fi, on="Feature", how="left")
+        .merge(lr_fi, on="Feature", how="left")
+    )
 
     return merged_df
+
 
 def evaluate_classification_model(model, X, y, cv=5):
     """
@@ -252,72 +279,74 @@ def feature_importance_plot(model, X, y):
     plt.title("Permutation Importances")
     plt.show()
 
+
 import pandas as pd
 from scipy.stats import ttest_ind
 
+
 def evaluate_regression_model(model, X, y):
-        # Split the dataset into training and test sets
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
+    # Split the dataset into training and test sets
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-        # Fit the model on the training data
-        model.fit(X_train, y_train)
+    # Fit the model on the training data
+    model.fit(X_train, y_train)
 
-        # Predict on test data
-        y_pred = model.predict(X_test)
+    # Predict on test data
+    y_pred = model.predict(X_test)
 
-        # Metrics
-        print("Mean Absolute Error (MAE):", mean_absolute_error(y_test, y_pred))
-        print("Mean Squared Error (MSE):", mean_squared_error(y_test, y_pred))
-        print(
-            "Root Mean Squared Error (RMSE):",
-            np.sqrt(mean_squared_error(y_test, y_pred)),
-        )
-        print("R-squared (R2):", r2_score(y_test, y_pred))
+    # Metrics
+    print("Mean Absolute Error (MAE):", mean_absolute_error(y_test, y_pred))
+    print("Mean Squared Error (MSE):", mean_squared_error(y_test, y_pred))
+    print(
+        "Root Mean Squared Error (RMSE):",
+        np.sqrt(mean_squared_error(y_test, y_pred)),
+    )
+    print("R-squared (R2):", r2_score(y_test, y_pred))
 
-        # Create figure
-        fig, axs = plt.subplots(2, 2, figsize=(16, 12))
+    # Create figure
+    fig, axs = plt.subplots(2, 2, figsize=(16, 12))
 
-        # Learning curve
-        train_sizes, train_scores, test_scores = learning_curve(model, X, y, cv=5)
-        train_scores_mean = np.mean(train_scores, axis=1)
-        test_scores_mean = np.mean(test_scores, axis=1)
-        axs[0, 0].plot(
-            train_sizes,
-            train_scores_mean,
-            "o-",
-            color="#a10606",
-            label="Training score",
-        )
-        axs[0, 0].plot(
-            train_sizes,
-            test_scores_mean,
-            "o-",
-            color="#6b8550",
-            label="Cross-validation score",
-        )
-        axs[0, 0].set_title("Learning Curve")
-        axs[0, 0].set_xlabel("Training Examples")
-        axs[0, 0].set_ylabel("Score")
-        axs[0, 0].legend(loc="best")
-        axs[0, 1].axis("off")  # Turn off unused subplot
+    # Learning curve
+    train_sizes, train_scores, test_scores = learning_curve(model, X, y, cv=5)
+    train_scores_mean = np.mean(train_scores, axis=1)
+    test_scores_mean = np.mean(test_scores, axis=1)
+    axs[0, 0].plot(
+        train_sizes,
+        train_scores_mean,
+        "o-",
+        color="#a10606",
+        label="Training score",
+    )
+    axs[0, 0].plot(
+        train_sizes,
+        test_scores_mean,
+        "o-",
+        color="#6b8550",
+        label="Cross-validation score",
+    )
+    axs[0, 0].set_title("Learning Curve")
+    axs[0, 0].set_xlabel("Training Examples")
+    axs[0, 0].set_ylabel("Score")
+    axs[0, 0].legend(loc="best")
+    axs[0, 1].axis("off")  # Turn off unused subplot
 
-        # Residuals plot
-        visualizer = ResidualsPlot(model, ax=axs[1, 0])
-        visualizer.fit(X_train, y_train)
-        visualizer.score(X_test, y_test)
-        visualizer.finalize()
+    # Residuals plot
+    visualizer = ResidualsPlot(model, ax=axs[1, 0])
+    visualizer.fit(X_train, y_train)
+    visualizer.score(X_test, y_test)
+    visualizer.finalize()
 
-        # Prediction error plot
-        visualizer = PredictionError(model, ax=axs[1, 1])
-        visualizer.fit(X_train, y_train)
-        visualizer.score(X_test, y_test)
-        visualizer.finalize()
+    # Prediction error plot
+    visualizer = PredictionError(model, ax=axs[1, 1])
+    visualizer.fit(X_train, y_train)
+    visualizer.score(X_test, y_test)
+    visualizer.finalize()
 
-        # Show all plots
-        plt.tight_layout()
-        plt.show()
+    # Show all plots
+    plt.tight_layout()
+    plt.show()
 
 
 def test_regression_models(X, y, test_size=0.2, random_state=None, scale_data=False):
@@ -336,7 +365,9 @@ def test_regression_models(X, y, test_size=0.2, random_state=None, scale_data=Fa
     """
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state
+    )
 
     # Define a list of regression models to test
     models = {
@@ -351,7 +382,7 @@ def test_regression_models(X, y, test_size=0.2, random_state=None, scale_data=Fa
         "Support Vector Regressor": SVR(),
         "K-Nearest Neighbors": KNeighborsRegressor(),
         "MLP Regressor": MLPRegressor(max_iter=1000),
-        "Gaussian Process": GaussianProcessRegressor()
+        "Gaussian Process": GaussianProcessRegressor(),
     }
 
     # DataFrame to store results
@@ -361,7 +392,7 @@ def test_regression_models(X, y, test_size=0.2, random_state=None, scale_data=Fa
     for name, model in tqdm(models.items(), desc="Testing Models"):
         # Create a pipeline if scaling is requested
         if scale_data:
-            pipeline = Pipeline([('scaler', StandardScaler()), ('regressor', model)])
+            pipeline = Pipeline([("scaler", StandardScaler()), ("regressor", model)])
             pipeline.fit(X_train, y_train)
             y_pred = pipeline.predict(X_test)
         else:
@@ -375,21 +406,22 @@ def test_regression_models(X, y, test_size=0.2, random_state=None, scale_data=Fa
         mae = mean_absolute_error(y_test, y_pred)
 
         # Append the results to the list
-        results.append({
-            "Model": name,
-            "R² Score": r2,
-            "MSE": mse,
-            "RMSE": rmse,
-            "MAE": mae
-        })
+        results.append(
+            {"Model": name, "R² Score": r2, "MSE": mse, "RMSE": rmse, "MAE": mae}
+        )
 
     # Convert the results list to a DataFrame
     results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values(by='R² Score', ascending=False).reset_index(drop=True)
+    results_df = results_df.sort_values(by="R² Score", ascending=False).reset_index(
+        drop=True
+    )
 
     return results_df
 
-def test_classification_models(X, y, test_size=0.2, random_state=None, scale_data=False):
+
+def test_classification_models(
+    X, y, test_size=0.2, random_state=None, scale_data=False
+):
     """
     Tests multiple classification models from sklearn on the given dataset.
 
@@ -405,7 +437,9 @@ def test_classification_models(X, y, test_size=0.2, random_state=None, scale_dat
     """
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state, stratify=y
+    )
 
     # Define a list of classification models to test
     models = {
@@ -417,7 +451,7 @@ def test_classification_models(X, y, test_size=0.2, random_state=None, scale_dat
         "Support Vector Classifier": SVC(probability=True),
         "K-Nearest Neighbors": KNeighborsClassifier(),
         "MLP Classifier": MLPClassifier(max_iter=1000),
-        "Naive Bayes": GaussianNB()
+        "Naive Bayes": GaussianNB(),
     }
 
     # DataFrame to store results
@@ -427,34 +461,46 @@ def test_classification_models(X, y, test_size=0.2, random_state=None, scale_dat
     for name, model in tqdm(models.items(), desc="Testing Models"):
         # Create a pipeline if scaling is requested
         if scale_data:
-            pipeline = Pipeline([('scaler', StandardScaler()), ('classifier', model)])
+            pipeline = Pipeline([("scaler", StandardScaler()), ("classifier", model)])
             pipeline.fit(X_train, y_train)
             y_pred = pipeline.predict(X_test)
-            y_proba = pipeline.predict_proba(X_test)[:, 1] if hasattr(pipeline, "predict_proba") else None
+            y_proba = (
+                pipeline.predict_proba(X_test)[:, 1]
+                if hasattr(pipeline, "predict_proba")
+                else None
+            )
         else:
             model.fit(X_train, y_train)
             y_pred = model.predict(X_test)
-            y_proba = model.predict_proba(X_test)[:, 1] if hasattr(model, "predict_proba") else None
+            y_proba = (
+                model.predict_proba(X_test)[:, 1]
+                if hasattr(model, "predict_proba")
+                else None
+            )
 
         # Calculate metrics
         accuracy = accuracy_score(y_test, y_pred)
-        precision = precision_score(y_test, y_pred, average='binary')
-        recall = recall_score(y_test, y_pred, average='binary')
-        f1 = f1_score(y_test, y_pred, average='binary')
+        precision = precision_score(y_test, y_pred, average="binary")
+        recall = recall_score(y_test, y_pred, average="binary")
+        f1 = f1_score(y_test, y_pred, average="binary")
         roc_auc = roc_auc_score(y_test, y_proba) if y_proba is not None else None
 
         # Append the results to the list
-        results.append({
-            "Model": name,
-            "Accuracy": accuracy,
-            "Precision": precision,
-            "Recall": recall,
-            "F1 Score": f1,
-            "ROC-AUC": roc_auc
-        })
+        results.append(
+            {
+                "Model": name,
+                "Accuracy": accuracy,
+                "Precision": precision,
+                "Recall": recall,
+                "F1 Score": f1,
+                "ROC-AUC": roc_auc,
+            }
+        )
 
     # Convert the results list to a DataFrame
     results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values(by='Accuracy', ascending=False).reset_index(drop=True)
+    results_df = results_df.sort_values(by="Accuracy", ascending=False).reset_index(
+        drop=True
+    )
 
     return results_df

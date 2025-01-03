@@ -97,7 +97,6 @@ class SheetHelper:
 
         return pd.DataFrame.from_dict(records)
 
-
     def get_unloaded_emails(self) -> pd.DataFrame:
         """
         Retrieves emails from the Google Sheet that have not been loaded into Chromedb.
@@ -109,7 +108,7 @@ class SheetHelper:
         df = pd.DataFrame.from_dict(records)
 
         # Assuming 'Status' is the column indicating if the email is loaded
-        unloaded_emails = df[df['Status'] != 'Loaded']
+        unloaded_emails = df[df["Status"] != "Loaded"]
         return unloaded_emails
 
     def mark_emails_as_loaded(self, email_ids):
@@ -124,10 +123,16 @@ class SheetHelper:
 
         # Determine the index of 'chroma_status' and 'Email' columns
         header = records[0].keys()
-        chroma_status_col = list(header).index('chroma_status') + 1  # gspread is 1-indexed
-        email_col = list(header).index('Email') + 1  # assuming 'Email' is the column with the identifier
+        chroma_status_col = (
+            list(header).index("chroma_status") + 1
+        )  # gspread is 1-indexed
+        email_col = (
+            list(header).index("Email") + 1
+        )  # assuming 'Email' is the column with the identifier
 
         for i, record in enumerate(records):
-            if record['Email'] in email_ids:
+            if record["Email"] in email_ids:
                 # Update the 'chroma_status' column to 1 for this email
-                self.update_cell(i + 2, chroma_status_col, 1)  # '+2' because records start from index 0 and Google Sheets rows start from 1 (excluding header)
+                self.update_cell(
+                    i + 2, chroma_status_col, 1
+                )  # '+2' because records start from index 0 and Google Sheets rows start from 1 (excluding header)

@@ -1,6 +1,7 @@
 """
 This module contains classes for reranking documents using Cohere's reranking model and a fusion ranking approach.
 """
+
 import json
 import os
 from typing import Any, Dict, List

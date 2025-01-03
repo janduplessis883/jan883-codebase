@@ -60,7 +60,7 @@ def main():
     hourly_dataframe = pd.DataFrame(hourly_data)
 
     # Clean data before plotting
-    hourly_dataframe.replace([float('inf'), float('-inf')], pd.NA, inplace=True)
+    hourly_dataframe.replace([float("inf"), float("-inf")], pd.NA, inplace=True)
     hourly_dataframe.dropna(inplace=True)
 
     # Plotting
@@ -69,7 +69,9 @@ def main():
 
     fig, ax = plt.subplots(figsize=(12, 5))
     sns.lineplot(data=hourly_dataframe, x="date", y="temperature_2m", color="#d95442")
-    sns.lineplot(data=hourly_dataframe, x="date", y="apparent_temperature", color="#d7d8d7")
+    sns.lineplot(
+        data=hourly_dataframe, x="date", y="apparent_temperature", color="#d7d8d7"
+    )
     sns.lineplot(data=hourly_dataframe, x="date", y="rain", color="#50b2d4")
     ax.yaxis.grid(True, linestyle="--", linewidth=0.5, color="#888888")
     ax.xaxis.grid(False)

@@ -1,6 +1,7 @@
 """
 This module contains the QueryEnhancer class for enhancing user queries using the Cohere API.
 """
+
 import json
 import os
 from enum import Enum

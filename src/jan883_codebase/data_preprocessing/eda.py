@@ -27,10 +27,17 @@ from sklearn.metrics import (
     auc,
     RocCurveDisplay,
 )
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+)
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from yellowbrick.regressor import ResidualsPlot, PredictionError
 from yellowbrick.classifier import DiscriminationThreshold, PrecisionRecallCurve
+
 # from imblearn.over_sampling import SMOTE
 
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
@@ -39,7 +46,11 @@ from datetime import datetime
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor
+from sklearn.ensemble import (
+    RandomForestRegressor,
+    GradientBoostingRegressor,
+    AdaBoostRegressor,
+)
 from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neural_network import MLPRegressor
@@ -47,7 +58,11 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
+from sklearn.ensemble import (
+    RandomForestClassifier,
+    GradientBoostingClassifier,
+    AdaBoostClassifier,
+)
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -71,13 +86,13 @@ from scipy.stats import pearsonr
 warnings.filterwarnings("ignore")
 
 
-
 def eda0():
     message = "<b>EDA Level 0 - Pure Understanding of Original Data</b> <BR>Basic check on the column datatype, null counts, distinct values, to get a better understanding of the data. I also created a distinct values count dictionary where I go the top 10 counts and their distinct values displayed so I could roughly gauge how significant the distinct values are in the dataset.<BR><b>Custom Functions</b><br> - <code>inspect_df(df)</code> Run df.head(), df.describe(), df.isna().sum() & df.duplicated().sum() on your dataframe. <br> - <code>column_summary(df)</code> Create a dataframe with column info, dtype, value_counts, etc.<br> - <code>column_summary_plus(df)</code> Create a dataframe with column info, dtype, value_counts, plus df.decsribe() info.<br> - <code>univariate_analysis(df)</code> Perform Univariate Analysis of numeric columns."
     html_message = f"""
         <span style="color: #274562; font-size: 12px;">{message}</span>
     """
     display(HTML(html_message))
+
 
 def eda1():
     message = """<b>EDA Level 1 — Transformation of Original Data</b> <BR>1. I changed the column names to all be in small letters and spaces to be changed to underscore. I also changed it to names that I feel are more generic and categorized, for easy interpretation.
@@ -99,6 +114,7 @@ def eda1():
         <span style="color: #274562; font-size: 12px;">{message}</span>
     """
     display(HTML(html_message))
+
 
 def eda2():
     message = """<b>EDA Level 2 — Understanding of Transformed Data</b> <BR>
@@ -160,7 +176,6 @@ def model():
     display(HTML(html_message))
 
 
-
 def convert_to_datetime(df, columns, day_first):
     """
     Converts the specified columns in the DataFrame to datetime format.
@@ -180,6 +195,7 @@ def convert_to_datetime(df, columns, day_first):
             raise ValueError(f"Column '{col}' not found in DataFrame.")
     display(df.info())
     return df
+
 
 def column_summary(df):
     """
@@ -203,16 +219,23 @@ def column_summary(df):
             distinct_values_counts = df[col_name].value_counts().to_dict()
         else:
             top_10_values_counts = df[col_name].value_counts().head(10).to_dict()
-            distinct_values_counts = {k: v for k, v in sorted(top_10_values_counts.items(), key=lambda item: item[1], reverse=True)}
+            distinct_values_counts = {
+                k: v
+                for k, v in sorted(
+                    top_10_values_counts.items(), key=lambda item: item[1], reverse=True
+                )
+            }
 
-        summary_data.append({
-            'col_name': col_name,
-            'col_dtype': col_dtype,
-            'num_of_nulls': num_of_nulls,
-            'num_of_non_nulls': num_of_non_nulls,
-            'num_of_distinct_values': num_of_distinct_values,
-            'distinct_values_counts': distinct_values_counts
-        })
+        summary_data.append(
+            {
+                "col_name": col_name,
+                "col_dtype": col_dtype,
+                "num_of_nulls": num_of_nulls,
+                "num_of_non_nulls": num_of_non_nulls,
+                "num_of_distinct_values": num_of_distinct_values,
+                "distinct_values_counts": distinct_values_counts,
+            }
+        )
 
     summary_df = pd.DataFrame(summary_data)
     return summary_df
@@ -259,7 +282,9 @@ def column_summary_plus(df: pd.DataFrame) -> pd.DataFrame:
         if np.issubdtype(dtype, np.number):
             if len_non_null_list > 0:
                 avg = sum(non_null_values) / len_non_null_list
-                non_zero_avg = sum([v for v in non_null_values if v > 0]) / len_non_null_list
+                non_zero_avg = (
+                    sum([v for v in non_null_values if v > 0]) / len_non_null_list
+                )
             else:
                 avg = None
                 non_zero_avg = None
@@ -280,22 +305,25 @@ def column_summary_plus(df: pd.DataFrame) -> pd.DataFrame:
         top_10_d_v_dict = dict(zip(top_10_d_v, top_10_c))
 
         # Append the information to the result list
-        result.append({
-            'col_name': col_name,
-            'col_dtype': dtype,
-            'num_distinct_values': num_distinct_values,
-            'min_value': min_value,
-            'max_value': max_value,
-            'median_no_na': median,
-            'average_no_na': avg,
-            'average_non_zero': non_zero_avg,
-            'null_present': null_present,
-            'nulls_num': num_nulls,
-            'non_nulls_num': num_non_nulls,
-            'distinct_values': top_10_d_v_dict
-        })
+        result.append(
+            {
+                "col_name": col_name,
+                "col_dtype": dtype,
+                "num_distinct_values": num_distinct_values,
+                "min_value": min_value,
+                "max_value": max_value,
+                "median_no_na": median,
+                "average_no_na": avg,
+                "average_non_zero": non_zero_avg,
+                "null_present": null_present,
+                "nulls_num": num_nulls,
+                "non_nulls_num": num_non_nulls,
+                "distinct_values": top_10_d_v_dict,
+            }
+        )
 
     return pd.DataFrame(result)
+
 
 def inspect_df(df):
     """
@@ -331,28 +359,34 @@ def univariate_analysis(df):
     # Perform univariate analysis on numerical columns
     for column in numerical_columns:
         # For continuous variables
-        if len(df[column].unique()) > 10:  # Assuming if unique values > 10, consider it continuous
+        if (
+            len(df[column].unique()) > 10
+        ):  # Assuming if unique values > 10, consider it continuous
             plt.figure(figsize=(8, 6))
             sns.histplot(df[column], kde=True)
-            plt.title(f'Histogram of {column}')
+            plt.title(f"Histogram of {column}")
             plt.xlabel(column)
-            plt.ylabel('Frequency')
+            plt.ylabel("Frequency")
             plt.show()
         else:  # For discrete or ordinal variables
             plt.figure(figsize=(8, 6))
             ax = sns.countplot(x=column, data=df)
-            plt.title(f'Count of {column}')
+            plt.title(f"Count of {column}")
             plt.xlabel(column)
-            plt.ylabel('Count')
+            plt.ylabel("Count")
 
             # Annotate each bar with its count
             for p in ax.patches:
-                ax.annotate(format(p.get_height(), '.0f'),
-                            (p.get_x() + p.get_width() / 2., p.get_height()),
-                            ha = 'center', va = 'center',
-                            xytext = (0, 5),
-                            textcoords = 'offset points')
+                ax.annotate(
+                    format(p.get_height(), ".0f"),
+                    (p.get_x() + p.get_width() / 2.0, p.get_height()),
+                    ha="center",
+                    va="center",
+                    xytext=(0, 5),
+                    textcoords="offset points",
+                )
             plt.show()
+
 
 def correlation_analysis(df, width=16, height=12):
     """
@@ -367,24 +401,26 @@ def correlation_analysis(df, width=16, height=12):
         None
     """
     numerical_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-    categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
+    categorical_cols = df.select_dtypes(include=["object"]).columns.tolist()
 
     # Assuming df is your DataFrame
     correlation_matrix = df[numerical_cols].corr()
 
     # Create the heatmap
     plt.figure(figsize=(width, height))  # Set the size of the plot
-    sns.heatmap(correlation_matrix, annot=True, cmap='viridis_r', fmt=".2f")
+    sns.heatmap(correlation_matrix, annot=True, cmap="viridis_r", fmt=".2f")
 
     # Set title
-    plt.title('Correlation Heatmap')
+    plt.title("Correlation Heatmap")
 
     # Show the plot
     plt.tight_layout()
     plt.show()
 
     # Find the max correlation
-    upper_triangular = correlation_matrix.where(np.triu(np.ones(correlation_matrix.shape), k=1).astype(bool))
+    upper_triangular = correlation_matrix.where(
+        np.triu(np.ones(correlation_matrix.shape), k=1).astype(bool)
+    )
     max_correlation = upper_triangular.max().max()
     print(f"Maximum pairwise correlation: {max_correlation:.2f}")
 
@@ -398,50 +434,51 @@ def update_column_names(df):
     Returns:
         pd.DataFrame: The input DataFrame with updated column names
     """
-    df.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
+    df.rename(columns=lambda x: x.lower().replace(" ", "_"), inplace=True)
     return df
 
 
 def iv_woe(df, target, bins=10, show_woe=False):
 
-    #Empty Dataframe
-    newDF,woeDF = pd.DataFrame(), pd.DataFrame()
+    # Empty Dataframe
+    newDF, woeDF = pd.DataFrame(), pd.DataFrame()
 
-    #Extract Column Names
+    # Extract Column Names
     cols = df.columns
 
-    #Run WOE and IV on all the independent variables
+    # Run WOE and IV on all the independent variables
     for ivars in cols[~cols.isin([target])]:
         print("Processing variable:", ivars)
-        if (df[ivars].dtype.kind in 'bifc') and (len(np.unique(df[ivars]))>10):
-            binned_x = pd.qcut(df[ivars], bins,  duplicates='drop')
-            d0 = pd.DataFrame({'x': binned_x, 'y': df[target]})
+        if (df[ivars].dtype.kind in "bifc") and (len(np.unique(df[ivars])) > 10):
+            binned_x = pd.qcut(df[ivars], bins, duplicates="drop")
+            d0 = pd.DataFrame({"x": binned_x, "y": df[target]})
         else:
-            d0 = pd.DataFrame({'x': df[ivars], 'y': df[target]})
-
+            d0 = pd.DataFrame({"x": df[ivars], "y": df[target]})
 
         # Calculate the number of events in each group (bin)
         d = d0.groupby("x", as_index=False, observed=False).agg({"y": ["count", "sum"]})
-        d.columns = ['Cutoff', 'N', 'Events']
+        d.columns = ["Cutoff", "N", "Events"]
 
         # Calculate % of events in each group.
-        d['% of Events'] = np.maximum(d['Events'], 0.5) / d['Events'].sum()
+        d["% of Events"] = np.maximum(d["Events"], 0.5) / d["Events"].sum()
 
         # Calculate the non events in each group.
-        d['Non-Events'] = d['N'] - d['Events']
+        d["Non-Events"] = d["N"] - d["Events"]
         # Calculate % of non events in each group.
-        d['% of Non-Events'] = np.maximum(d['Non-Events'], 0.5) / d['Non-Events'].sum()
+        d["% of Non-Events"] = np.maximum(d["Non-Events"], 0.5) / d["Non-Events"].sum()
 
         # Calculate WOE by taking natural log of division of % of non-events and % of events
-        d['WoE'] = np.log(d['% of Events']/d['% of Non-Events'])
-        d['IV'] = d['WoE'] * (d['% of Events'] - d['% of Non-Events'])
-        d.insert(loc=0, column='Variable', value=ivars)
-        print("Information value of " + ivars + " is " + str(round(d['IV'].sum(),6)))
-        temp =pd.DataFrame({"Variable" : [ivars], "IV" : [d['IV'].sum()]}, columns = ["Variable", "IV"])
-        newDF=pd.concat([newDF,temp], axis=0)
-        woeDF=pd.concat([woeDF,d], axis=0)
+        d["WoE"] = np.log(d["% of Events"] / d["% of Non-Events"])
+        d["IV"] = d["WoE"] * (d["% of Events"] - d["% of Non-Events"])
+        d.insert(loc=0, column="Variable", value=ivars)
+        print("Information value of " + ivars + " is " + str(round(d["IV"].sum(), 6)))
+        temp = pd.DataFrame(
+            {"Variable": [ivars], "IV": [d["IV"].sum()]}, columns=["Variable", "IV"]
+        )
+        newDF = pd.concat([newDF, temp], axis=0)
+        woeDF = pd.concat([woeDF, d], axis=0)
 
-        #Show WOE Table
+        # Show WOE Table
         if show_woe == True:
             print(d)
     return newDF, woeDF
@@ -486,7 +523,9 @@ def one_hot_encode_column(df, column_name, drop_original=True):
     pd.DataFrame: A new dataframe with the one-hot encoded columns added.
     """
     # Initialize the OneHotEncoder
-    encoder = OneHotEncoder(sparse_output=False, drop=None)  # sparse_output=False returns a dense array
+    encoder = OneHotEncoder(
+        sparse_output=False, drop=None
+    )  # sparse_output=False returns a dense array
 
     # Fit and transform the specified column
     encoded_array = encoder.fit_transform(df[[column_name]])
@@ -494,7 +533,7 @@ def one_hot_encode_column(df, column_name, drop_original=True):
     # Create a DataFrame with the encoded column names
     encoded_df = pd.DataFrame(
         encoded_array,
-        columns=[f"{column_name}_{category}" for category in encoder.categories_[0]]
+        columns=[f"{column_name}_{category}" for category in encoder.categories_[0]],
     )
 
     # Align index with the original dataframe to avoid any issues
@@ -510,7 +549,9 @@ def one_hot_encode_column(df, column_name, drop_original=True):
     return df_encoded
 
 
-def scale_X_train_X_test(X_train, X_test, scaler="standard", save_scaler=False, plot=True):
+def scale_X_train_X_test(
+    X_train, X_test, scaler="standard", save_scaler=False, plot=True
+):
     """
     Function to scale the numerical features of a dataframe and plot histograms of scaled features.
 
@@ -530,7 +571,9 @@ def scale_X_train_X_test(X_train, X_test, scaler="standard", save_scaler=False, 
     elif scaler == "robust":
         scaler = RobustScaler()
     else:
-        raise ValueError('Invalid scaler type. Choose "standard", "minmax", or "robust".')
+        raise ValueError(
+            'Invalid scaler type. Choose "standard", "minmax", or "robust".'
+        )
 
     # Get the column headers
     column_headers = X_train.columns
@@ -545,33 +588,45 @@ def scale_X_train_X_test(X_train, X_test, scaler="standard", save_scaler=False, 
 
     if save_scaler:
         # Generate a filename with a timestamp
-        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        scaler_filename = f'scaler_{scaler.__class__.__name__}_{timestamp}'
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        scaler_filename = f"scaler_{scaler.__class__.__name__}_{timestamp}"
 
         # Save the scaler to a file
-        with open(f'{scaler_filename}.pkl', 'wb') as f:
+        with open(f"{scaler_filename}.pkl", "wb") as f:
             pickle.dump(scaler, f)
 
         print(f"💾 Scaler saved to: {scaler_filename}")
 
-    print(f"✅ scaled_X_train: fit_transform {scaler.__class__.__name__} - {scaled_X_train.shape}")
-    print(f"✅ scaled_X_test: transform {scaler.__class__.__name__} - {scaled_X_test.shape}")
+    print(
+        f"✅ scaled_X_train: fit_transform {scaler.__class__.__name__} - {scaled_X_train.shape}"
+    )
+    print(
+        f"✅ scaled_X_test: transform {scaler.__class__.__name__} - {scaled_X_test.shape}"
+    )
 
     if plot == True:
         # Plot the histograms of the scaled features for training data using seaborn
         plt.figure(figsize=(10, 6))
-        sns.histplot(scaled_X_train, kde=True, element='step', bins=30, palette='inferno')
-        plt.title(f'Distribution of Scaled Features in Training Set ({scaler.__class__.__name__})')
-        plt.xlabel('Scaled Values')
-        plt.ylabel('Frequency')
+        sns.histplot(
+            scaled_X_train, kde=True, element="step", bins=30, palette="inferno"
+        )
+        plt.title(
+            f"Distribution of Scaled Features in Training Set ({scaler.__class__.__name__})"
+        )
+        plt.xlabel("Scaled Values")
+        plt.ylabel("Frequency")
         plt.show()
 
         # Plot the histograms of the scaled features for test data using seaborn
         plt.figure(figsize=(10, 6))
-        sns.histplot(scaled_X_test, kde=True, element='step', bins=30, palette='inferno')
-        plt.title(f'Distribution of Scaled Features in Test Set ({scaler.__class__.__name__})')
-        plt.xlabel('Scaled Values')
-        plt.ylabel('Frequency')
+        sns.histplot(
+            scaled_X_test, kde=True, element="step", bins=30, palette="inferno"
+        )
+        plt.title(
+            f"Distribution of Scaled Features in Test Set ({scaler.__class__.__name__})"
+        )
+        plt.xlabel("Scaled Values")
+        plt.ylabel("Frequency")
         plt.show()
 
     return scaled_X_train, scaled_X_test
@@ -606,15 +661,18 @@ def scale_df(X, scaler="standard", plot=True):
     if plot == True:
         # Plot the histograms of the scaled features using seaborn
         plt.figure(figsize=(10, 6))
-        sns.histplot(scaled_X, kde=True, element='step', bins=30, palette='inferno')
-        plt.title(f'Distribution of Scaled Features ({scaler.__class__.__name__})')
-        plt.xlabel('Scaled Values')
-        plt.ylabel('Frequency')
+        sns.histplot(scaled_X, kde=True, element="step", bins=30, palette="inferno")
+        plt.title(f"Distribution of Scaled Features ({scaler.__class__.__name__})")
+        plt.xlabel("Scaled Values")
+        plt.ylabel("Frequency")
         plt.show()
 
     return scaled_X
 
-def oversample_SMOTE(X_train, y_train, sampling_strategy="auto", k_neighbors=5, random_state=42):
+
+def oversample_SMOTE(
+    X_train, y_train, sampling_strategy="auto", k_neighbors=5, random_state=42
+):
     """
     Oversamples the minority class in the provided DataFrame using the SMOTE (Synthetic Minority Over-sampling Technique) method.
 
@@ -741,8 +799,16 @@ def sample_df(df, n_samples):
         return sampled_df
 
 
-
-def individual_t_test_classification(df, y_column, y_value_1, y_value_2, list_of_features, alpha_val=0.05, sample_frac=1.0, random_state=None):
+def individual_t_test_classification(
+    df,
+    y_column,
+    y_value_1,
+    y_value_2,
+    list_of_features,
+    alpha_val=0.05,
+    sample_frac=1.0,
+    random_state=None,
+):
     """
     Performs individual t-tests for continuous variables between two groups defined by the y_column values.
 
@@ -774,22 +840,29 @@ def individual_t_test_classification(df, y_column, y_value_1, y_value_2, list_of
         fea_2 = group_2[feature]
 
         t_stat, p_val = ttest_ind(fea_1, fea_2, equal_var=False)
-        t_stat1 = f'{t_stat:.3f}'
-        p_val1 = f'{p_val:.3f}'
+        t_stat1 = f"{t_stat:.3f}"
+        p_val1 = f"{p_val:.3f}"
 
         if p_val < alpha_val:
-            sig = 'Significant'
+            sig = "Significant"
         else:
-            sig = 'Insignificant'
+            sig = "Insignificant"
 
-        new_dict = {'feature': feature, 't_stat': t_stat1,
-                    'p_value': p_val1, 'significance': sig}
+        new_dict = {
+            "feature": feature,
+            "t_stat": t_stat1,
+            "p_value": p_val1,
+            "significance": sig,
+        }
         new_list.append(new_dict)
 
     df_result = pd.DataFrame(new_list)
     return df_result
 
-def individual_t_test_regression(df, y_column, list_of_features, alpha_val=0.05, sample_frac=1.0, random_state=None):
+
+def individual_t_test_regression(
+    df, y_column, list_of_features, alpha_val=0.05, sample_frac=1.0, random_state=None
+):
     """
     Performs individual t-tests for continuous variables between two groups defined by the median split of the target column.
 
@@ -821,59 +894,77 @@ def individual_t_test_regression(df, y_column, list_of_features, alpha_val=0.05,
         fea_2 = group_2[feature]
 
         t_stat, p_val = ttest_ind(fea_1, fea_2, equal_var=False)
-        t_stat1 = f'{t_stat:.3f}'
-        p_val1 = f'{p_val:.3f}'
+        t_stat1 = f"{t_stat:.3f}"
+        p_val1 = f"{p_val:.3f}"
 
         if p_val < alpha_val:
-            sig = 'Significant'
+            sig = "Significant"
         else:
-            sig = 'Insignificant'
+            sig = "Insignificant"
 
-        new_dict = {'feature': feature, 't_stat': t_stat1,
-                    'p_value': p_val1, 'significance': sig}
+        new_dict = {
+            "feature": feature,
+            "t_stat": t_stat1,
+            "p_value": p_val1,
+            "significance": sig,
+        }
         new_list.append(new_dict)
 
     df_result = pd.DataFrame(new_list)
     return df_result
 
+
 def feature_importance_comparison(X_train, y_train):
-    def feature_importance_sorted(classification_model_input, X_train, y_train, feature_importance_input=None):
+    def feature_importance_sorted(
+        classification_model_input, X_train, y_train, feature_importance_input=None
+    ):
         if classification_model_input is not None:
             some_model = classification_model_input
             some_model.fit(X_train, y_train)
             feature_importances = some_model.feature_importances_
         else:
             feature_importances = feature_importance_input
-        feature_importances_sorted = sorted(zip(X_train.columns, feature_importances), key=lambda x: x[1], reverse=True)
-        df_feature_importances = pd.DataFrame(feature_importances_sorted, columns=['Feature', 'Importance'])
-        df_feature_importances['rank'] = range(1, len(df_feature_importances)+1)
+        feature_importances_sorted = sorted(
+            zip(X_train.columns, feature_importances), key=lambda x: x[1], reverse=True
+        )
+        df_feature_importances = pd.DataFrame(
+            feature_importances_sorted, columns=["Feature", "Importance"]
+        )
+        df_feature_importances["rank"] = range(1, len(df_feature_importances) + 1)
         return df_feature_importances
 
     # Decision Tree Classifier Feature Importance
     dtc_fi = feature_importance_sorted(DecisionTreeClassifier(), X_train, y_train)
-    dtc_fi = dtc_fi.rename(columns={'Importance': 'imp_dtc', 'rank': 'rank_dtc'})
+    dtc_fi = dtc_fi.rename(columns={"Importance": "imp_dtc", "rank": "rank_dtc"})
 
     # Random Forest Classifier Feature Importance
-    rfc_fi = feature_importance_sorted(RandomForestClassifier(), X_train, y_train.values.ravel())
-    rfc_fi = rfc_fi.rename(columns={'Importance': 'imp_rfc', 'rank': 'rank_rfc'})
+    rfc_fi = feature_importance_sorted(
+        RandomForestClassifier(), X_train, y_train.values.ravel()
+    )
+    rfc_fi = rfc_fi.rename(columns={"Importance": "imp_rfc", "rank": "rank_rfc"})
 
     # XGB Classifier Feature Importance
     xgb_fi = feature_importance_sorted(xgb.XGBClassifier(), X_train, y_train)
-    xgb_fi = xgb_fi.rename(columns={'Importance': 'imp_xgb', 'rank': 'rank_xgb'})
+    xgb_fi = xgb_fi.rename(columns={"Importance": "imp_xgb", "rank": "rank_xgb"})
 
     # Logistic Regression Feature Importance
     lr = LogisticRegression(max_iter=10000)
     lr.fit(X_train, y_train.values.ravel())
     feature_importances = lr.coef_[0]  # Assuming binary classification
-    lr_fi = feature_importance_sorted(None, X_train, y_train.values.ravel(), feature_importances)
-    lr_fi = lr_fi.rename(columns={'Importance': 'imp_lr', 'rank': 'rank_lr'})
+    lr_fi = feature_importance_sorted(
+        None, X_train, y_train.values.ravel(), feature_importances
+    )
+    lr_fi = lr_fi.rename(columns={"Importance": "imp_lr", "rank": "rank_lr"})
 
     # Merge the results from all models
-    merged_df = dtc_fi.merge(rfc_fi, on='Feature', how='left')\
-                      .merge(xgb_fi, on='Feature', how='left')\
-                      .merge(lr_fi, on='Feature', how='left')
+    merged_df = (
+        dtc_fi.merge(rfc_fi, on="Feature", how="left")
+        .merge(xgb_fi, on="Feature", how="left")
+        .merge(lr_fi, on="Feature", how="left")
+    )
 
     return merged_df
+
 
 from sklearn.metrics import (
     RocCurveDisplay,
@@ -892,6 +983,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import label_binarize
 from IPython.display import display, HTML
+
 
 def evaluate_classification_model(model, X, y, cv=5):
     """
@@ -1024,6 +1116,7 @@ def evaluate_classification_model(model, X, y, cv=5):
     plt.tight_layout()
     plt.show()
 
+
 def feature_importance_plot(model, X, y):
     """
     Displays the feature importances of a model using permutation importance.
@@ -1080,72 +1173,74 @@ def feature_importance_plot(model, X, y):
     plt.title("Permutation Importances")
     plt.show()
 
+
 import pandas as pd
 from scipy.stats import ttest_ind
 
+
 def evaluate_regression_model(model, X, y):
-        # Split the dataset into training and test sets
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
+    # Split the dataset into training and test sets
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-        # Fit the model on the training data
-        model.fit(X_train, y_train)
+    # Fit the model on the training data
+    model.fit(X_train, y_train)
 
-        # Predict on test data
-        y_pred = model.predict(X_test)
+    # Predict on test data
+    y_pred = model.predict(X_test)
 
-        # Metrics
-        print("Mean Absolute Error (MAE):", mean_absolute_error(y_test, y_pred))
-        print("Mean Squared Error (MSE):", mean_squared_error(y_test, y_pred))
-        print(
-            "Root Mean Squared Error (RMSE):",
-            np.sqrt(mean_squared_error(y_test, y_pred)),
-        )
-        print("R-squared (R2):", r2_score(y_test, y_pred))
+    # Metrics
+    print("Mean Absolute Error (MAE):", mean_absolute_error(y_test, y_pred))
+    print("Mean Squared Error (MSE):", mean_squared_error(y_test, y_pred))
+    print(
+        "Root Mean Squared Error (RMSE):",
+        np.sqrt(mean_squared_error(y_test, y_pred)),
+    )
+    print("R-squared (R2):", r2_score(y_test, y_pred))
 
-        # Create figure
-        fig, axs = plt.subplots(2, 2, figsize=(16, 12))
+    # Create figure
+    fig, axs = plt.subplots(2, 2, figsize=(16, 12))
 
-        # Learning curve
-        train_sizes, train_scores, test_scores = learning_curve(model, X, y, cv=5)
-        train_scores_mean = np.mean(train_scores, axis=1)
-        test_scores_mean = np.mean(test_scores, axis=1)
-        axs[0, 0].plot(
-            train_sizes,
-            train_scores_mean,
-            "o-",
-            color="#a10606",
-            label="Training score",
-        )
-        axs[0, 0].plot(
-            train_sizes,
-            test_scores_mean,
-            "o-",
-            color="#6b8550",
-            label="Cross-validation score",
-        )
-        axs[0, 0].set_title("Learning Curve")
-        axs[0, 0].set_xlabel("Training Examples")
-        axs[0, 0].set_ylabel("Score")
-        axs[0, 0].legend(loc="best")
-        axs[0, 1].axis("off")  # Turn off unused subplot
+    # Learning curve
+    train_sizes, train_scores, test_scores = learning_curve(model, X, y, cv=5)
+    train_scores_mean = np.mean(train_scores, axis=1)
+    test_scores_mean = np.mean(test_scores, axis=1)
+    axs[0, 0].plot(
+        train_sizes,
+        train_scores_mean,
+        "o-",
+        color="#a10606",
+        label="Training score",
+    )
+    axs[0, 0].plot(
+        train_sizes,
+        test_scores_mean,
+        "o-",
+        color="#6b8550",
+        label="Cross-validation score",
+    )
+    axs[0, 0].set_title("Learning Curve")
+    axs[0, 0].set_xlabel("Training Examples")
+    axs[0, 0].set_ylabel("Score")
+    axs[0, 0].legend(loc="best")
+    axs[0, 1].axis("off")  # Turn off unused subplot
 
-        # Residuals plot
-        visualizer = ResidualsPlot(model, ax=axs[1, 0])
-        visualizer.fit(X_train, y_train)
-        visualizer.score(X_test, y_test)
-        visualizer.finalize()
+    # Residuals plot
+    visualizer = ResidualsPlot(model, ax=axs[1, 0])
+    visualizer.fit(X_train, y_train)
+    visualizer.score(X_test, y_test)
+    visualizer.finalize()
 
-        # Prediction error plot
-        visualizer = PredictionError(model, ax=axs[1, 1])
-        visualizer.fit(X_train, y_train)
-        visualizer.score(X_test, y_test)
-        visualizer.finalize()
+    # Prediction error plot
+    visualizer = PredictionError(model, ax=axs[1, 1])
+    visualizer.fit(X_train, y_train)
+    visualizer.score(X_test, y_test)
+    visualizer.finalize()
 
-        # Show all plots
-        plt.tight_layout()
-        plt.show()
+    # Show all plots
+    plt.tight_layout()
+    plt.show()
 
 
 def best_regression_models(X, y, test_size=0.2, random_state=None, scale_data=False):
@@ -1164,7 +1259,9 @@ def best_regression_models(X, y, test_size=0.2, random_state=None, scale_data=Fa
     """
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state
+    )
 
     # Define a list of regression models to test
     models = {
@@ -1179,17 +1276,19 @@ def best_regression_models(X, y, test_size=0.2, random_state=None, scale_data=Fa
         "Support Vector Regressor": SVR(),
         "K-Nearest Neighbors": KNeighborsRegressor(),
         "MLP Regressor": MLPRegressor(max_iter=1000),
-        "Gaussian Process": GaussianProcessRegressor()
+        "Gaussian Process": GaussianProcessRegressor(),
     }
 
     # DataFrame to store results
     results = []
 
     # Loop over models and evaluate each one with a progress bar
-    for name, model in tqdm(models.items(), desc="Testing Regression Models", colour='#9a276b'):
+    for name, model in tqdm(
+        models.items(), desc="Testing Regression Models", colour="#9a276b"
+    ):
         # Create a pipeline if scaling is requested
         if scale_data:
-            pipeline = Pipeline([('scaler', StandardScaler()), ('regressor', model)])
+            pipeline = Pipeline([("scaler", StandardScaler()), ("regressor", model)])
             pipeline.fit(X_train, y_train)
             y_pred = pipeline.predict(X_test)
         else:
@@ -1203,21 +1302,22 @@ def best_regression_models(X, y, test_size=0.2, random_state=None, scale_data=Fa
         mae = mean_absolute_error(y_test, y_pred)
 
         # Append the results to the list
-        results.append({
-            "Model": name,
-            "R² Score": r2,
-            "MSE": mse,
-            "RMSE": rmse,
-            "MAE": mae
-        })
+        results.append(
+            {"Model": name, "R² Score": r2, "MSE": mse, "RMSE": rmse, "MAE": mae}
+        )
 
     # Convert the results list to a DataFrame
     results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values(by='R² Score', ascending=False).reset_index(drop=True)
+    results_df = results_df.sort_values(by="R² Score", ascending=False).reset_index(
+        drop=True
+    )
 
     return results_df
 
-def best_classification_models(X, y, test_size=0.2, random_state=None, scale_data=False):
+
+def best_classification_models(
+    X, y, test_size=0.2, random_state=None, scale_data=False
+):
     """
     Tests multiple classification models from sklearn on the given dataset.
 
@@ -1233,7 +1333,9 @@ def best_classification_models(X, y, test_size=0.2, random_state=None, scale_dat
     """
 
     # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state, stratify=y
+    )
 
     # Define a list of classification models to test
     models = {
@@ -1245,32 +1347,40 @@ def best_classification_models(X, y, test_size=0.2, random_state=None, scale_dat
         "Support Vector Classifier": SVC(probability=True),
         "K-Nearest Neighbors": KNeighborsClassifier(),
         "MLP Classifier": MLPClassifier(max_iter=1000),
-        "Naive Bayes": GaussianNB()
+        "Naive Bayes": GaussianNB(),
     }
 
     # Determine if the target is binary or multiclass
     if len(pd.Series(y).unique()) > 2:
-        average_type = 'weighted'
-        roc_auc_multi_class = 'ovr'  # or 'ovo', depending on the use case
+        average_type = "weighted"
+        roc_auc_multi_class = "ovr"  # or 'ovo', depending on the use case
     else:
-        average_type = 'binary'
+        average_type = "binary"
         roc_auc_multi_class = None  # Not needed for binary classification
 
     # DataFrame to store results
     results = []
 
     # Loop over models and evaluate each one with a progress bar
-    for name, model in tqdm(models.items(), desc="Testing Classification Models", colour='#9a276b'):
+    for name, model in tqdm(
+        models.items(), desc="Testing Classification Models", colour="#9a276b"
+    ):
         # Create a pipeline if scaling is requested
         if scale_data:
-            pipeline = Pipeline([('scaler', StandardScaler()), ('classifier', model)])
+            pipeline = Pipeline([("scaler", StandardScaler()), ("classifier", model)])
             pipeline.fit(X_train, y_train)
             y_pred = pipeline.predict(X_test)
-            y_proba = pipeline.predict_proba(X_test) if hasattr(pipeline, "predict_proba") else None
+            y_proba = (
+                pipeline.predict_proba(X_test)
+                if hasattr(pipeline, "predict_proba")
+                else None
+            )
         else:
             model.fit(X_train, y_train)
             y_pred = model.predict(X_test)
-            y_proba = model.predict_proba(X_test) if hasattr(model, "predict_proba") else None
+            y_proba = (
+                model.predict_proba(X_test) if hasattr(model, "predict_proba") else None
+            )
 
         # Calculate metrics
         accuracy = accuracy_score(y_test, y_pred)
@@ -1281,27 +1391,38 @@ def best_classification_models(X, y, test_size=0.2, random_state=None, scale_dat
         # Calculate ROC-AUC score appropriately
         if y_proba is not None:
             if roc_auc_multi_class:  # Multiclass case
-                roc_auc = roc_auc_score(y_test, y_proba, multi_class=roc_auc_multi_class, average='weighted')
+                roc_auc = roc_auc_score(
+                    y_test, y_proba, multi_class=roc_auc_multi_class, average="weighted"
+                )
             else:  # Binary case
-                roc_auc = roc_auc_score(y_test, y_proba[:, 1]) if y_proba.shape[1] > 1 else roc_auc_score(y_test, y_proba)
+                roc_auc = (
+                    roc_auc_score(y_test, y_proba[:, 1])
+                    if y_proba.shape[1] > 1
+                    else roc_auc_score(y_test, y_proba)
+                )
         else:
             roc_auc = None
 
         # Append the results to the list
-        results.append({
-            "Model": name,
-            "Accuracy": accuracy,
-            "Precision": precision,
-            "Recall": recall,
-            "F1 Score": f1,
-            "ROC-AUC": roc_auc
-        })
+        results.append(
+            {
+                "Model": name,
+                "Accuracy": accuracy,
+                "Precision": precision,
+                "Recall": recall,
+                "F1 Score": f1,
+                "ROC-AUC": roc_auc,
+            }
+        )
 
     # Convert the results list to a DataFrame
     results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values(by='Accuracy', ascending=False).reset_index(drop=True)
+    results_df = results_df.sort_values(by="Accuracy", ascending=False).reset_index(
+        drop=True
+    )
 
     return results_df
+
 
 def plot_elbow_method(scaled_df, k_range=(4, 12), random_state=None):
     """
@@ -1352,13 +1473,15 @@ def plot_intercluster_distance(X, n_clusters=6, random_state=None):
     # Finalize and render the figure
     visualizer.show()
 
+
 # Example usage
 # plot_intercluster_distance(X, n_clusters=6, random_state=42)
 
 from sklearn.cluster import KMeans
 from yellowbrick.cluster import SilhouetteVisualizer
 
-def plot_silhouette_visualizer(X, n_clusters=4, random_state=42, colors='yellowbrick'):
+
+def plot_silhouette_visualizer(X, n_clusters=4, random_state=42, colors="yellowbrick"):
     """
     Plots the silhouette visualizer for KMeans clustering.
 
@@ -1383,12 +1506,12 @@ def plot_silhouette_visualizer(X, n_clusters=4, random_state=42, colors='yellowb
     # Finalize and render the figure
     visualizer.show()
 
+
 # Example usage
 # plot_silhouette_visualizer(scaled_X, n_clusters=10, random_state=42, colors='yellowbrick')
 
 
-
-def plot_learning_curve(X, y, problem_type='classification', scoring='accuracy'):
+def plot_learning_curve(X, y, problem_type="classification", scoring="accuracy"):
     """
     Plots the learning curve for a model based on the type of problem (classification or regression).
 
@@ -1403,15 +1526,18 @@ def plot_learning_curve(X, y, problem_type='classification', scoring='accuracy')
     """
 
     # Choose the model based on the problem type
-    if problem_type == 'classification':
+    if problem_type == "classification":
         model = LogisticRegression()
-    elif problem_type == 'regression':
+    elif problem_type == "regression":
         model = LinearRegression()
     else:
-        raise ValueError("Invalid problem_type. Choose either 'classification' or 'regression'.")
+        raise ValueError(
+            "Invalid problem_type. Choose either 'classification' or 'regression'."
+        )
 
     # Plot the learning curve
     learning_curve(model, X, y, scoring=scoring)
+
 
 # Example usage
 # For classification problem
@@ -1421,8 +1547,7 @@ def plot_learning_curve(X, y, problem_type='classification', scoring='accuracy')
 # plot_learning_curve(X, y, problem_type='regression', scoring='r2')
 
 
-
-def plot_rfecv(X, y, problem_type='classification', cv_splits=5, scoring='f1_weighted'):
+def plot_rfecv(X, y, problem_type="classification", cv_splits=5, scoring="f1_weighted"):
     """
     Plots the Recursive Feature Elimination with Cross-Validation (RFECV) for a model
     based on the type of problem (classification or regression).
@@ -1439,18 +1564,20 @@ def plot_rfecv(X, y, problem_type='classification', cv_splits=5, scoring='f1_wei
     """
 
     # Choose the model and CV strategy based on the problem type
-    if problem_type == 'classification':
+    if problem_type == "classification":
         model = RandomForestClassifier()
         cv = StratifiedKFold(cv_splits)
-        if scoring == 'default':
-            scoring = 'f1_weighted'
-    elif problem_type == 'regression':
+        if scoring == "default":
+            scoring = "f1_weighted"
+    elif problem_type == "regression":
         model = RandomForestRegressor()
         cv = KFold(cv_splits)
-        if scoring == 'default':
-            scoring = 'r2'
+        if scoring == "default":
+            scoring = "r2"
     else:
-        raise ValueError("Invalid problem_type. Choose either 'classification' or 'regression'.")
+        raise ValueError(
+            "Invalid problem_type. Choose either 'classification' or 'regression'."
+        )
 
     # Instantiate the RFECV visualizer with the chosen model, CV strategy, and scoring
     visualizer = rfecv(model, X=X, y=y, cv=cv, scoring=scoring)
@@ -1461,6 +1588,7 @@ def plot_rfecv(X, y, problem_type='classification', cv_splits=5, scoring='f1_wei
     # Finalize and render the figure
     visualizer.show()
 
+
 # Example usage
 # For classification problem
 # plot_rfecv(X, y, problem_type='classification', cv_splits=5, scoring='f1_weighted')
@@ -1469,7 +1597,7 @@ def plot_rfecv(X, y, problem_type='classification', cv_splits=5, scoring='f1_wei
 # plot_rfecv(X, y, problem_type='regression', cv_splits=5, scoring='r2')
 
 
-def impute_values(df, missing_values=0, copy=True, strategy='mean', columns=None):
+def impute_values(df, missing_values=0, copy=True, strategy="mean", columns=None):
     """
     Impute specified values in the DataFrame using the provided strategy.
 
@@ -1526,12 +1654,13 @@ def remove_outliers_zscore(df, threshold=3):
 
     return no_outliers_df
 
+
 # Example usage:
 # Assuming you have a DataFrame named 'train'
 # train_no_outliers = remove_outliers_zscore(train)
 
 
-def impute_missing_values(df, strategy='mean'):
+def impute_missing_values(df, strategy="mean"):
     """
     Fills NaN values in the given DataFrame using the specified strategy.
 
@@ -1557,7 +1686,6 @@ def impute_missing_values(df, strategy='mean'):
             df_imputed[column] = imputer.fit_transform(df_imputed[[column]])
 
     return df_imputed
-
 
 
 def create_qq_plots(df, reference_col):
@@ -1591,16 +1719,26 @@ def create_qq_plots(df, reference_col):
 
         # Generate the QQ plot
         plt.figure(figsize=(6, 5))
-        plt.scatter(-np.log10(expected), -np.log10(sorted_p), color="blue", alpha=0.6, label=f"Observed P-value: {p_value:.4f}")
-        plt.plot([0, -np.log10(expected[-1])], [0, -np.log10(expected[-1])], color="red", linestyle="--", label="Expected = Observed")
+        plt.scatter(
+            -np.log10(expected),
+            -np.log10(sorted_p),
+            color="blue",
+            alpha=0.6,
+            label=f"Observed P-value: {p_value:.4f}",
+        )
+        plt.plot(
+            [0, -np.log10(expected[-1])],
+            [0, -np.log10(expected[-1])],
+            color="red",
+            linestyle="--",
+            label="Expected = Observed",
+        )
         plt.title(f"QQ Plot: {feature} vs {reference_col}")
         plt.xlabel("Expected -log10(P)")
         plt.ylabel("Observed -log10(P)")
         plt.legend()
         plt.grid(alpha=0.3)
         plt.show()
-
-
 
 
 def volcano_plot(df, reference_col):
@@ -1640,11 +1778,9 @@ def volcano_plot(df, reference_col):
             continue
 
     # Convert results to a DataFrame for plotting
-    results_df = pd.DataFrame({
-        "feature": features,
-        "p_value": p_values,
-        "effect_size": effect_sizes
-    })
+    results_df = pd.DataFrame(
+        {"feature": features, "p_value": p_values, "effect_size": effect_sizes}
+    )
 
     # Adjust significance threshold for multiple comparisons (Bonferroni correction)
     significance_threshold = 0.05 / len(features) if features else 0.05
@@ -1654,9 +1790,16 @@ def volcano_plot(df, reference_col):
     plt.scatter(
         results_df["effect_size"],
         -np.log10(results_df["p_value"]),
-        color="blue", alpha=0.7, label="Features"
+        color="blue",
+        alpha=0.7,
+        label="Features",
     )
-    plt.axhline(-np.log10(significance_threshold), color="red", linestyle="--", label=f"P = {significance_threshold:.2e}")
+    plt.axhline(
+        -np.log10(significance_threshold),
+        color="red",
+        linestyle="--",
+        label=f"P = {significance_threshold:.2e}",
+    )
     plt.axvline(0, color="gray", linestyle="--", label="No Effect")
     plt.title("Volcano Plot")
     plt.xlabel("Effect Size (Correlation Coefficient)")
@@ -1669,10 +1812,11 @@ def volcano_plot(df, reference_col):
     for _, row in significant_features.iterrows():
         plt.text(
             row["effect_size"],
-            -np.log10(row["p_value"]) + 0.1,  # Offset the text slightly to avoid overlap
+            -np.log10(row["p_value"])
+            + 0.1,  # Offset the text slightly to avoid overlap
             row["feature"],
             fontsize=8,
-            ha='center'
+            ha="center",
         )
 
     plt.show()

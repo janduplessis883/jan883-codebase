@@ -33,7 +33,9 @@ def create_df(dataset_dir, csv_files):
         try:
             df[file] = pd.read_csv(os.path.join(data_path, file))
         except UnicodeDecodeError:
-            df[file] = pd.read_csv(os.path.join(data_path, file), encoding="ISO-8859-1")  # if utf-8 encoding error
+            df[file] = pd.read_csv(
+                os.path.join(data_path, file), encoding="ISO-8859-1"
+            )  # if utf-8 encoding error
         print(file)
 
     return df
@@ -78,20 +80,30 @@ def clean_colname(dataframe):
         "datetime64": "DATETIME",
     }
 
-    col_str = ", ".join(f"`{n}` {d}" for n, d in zip(dataframe.columns, dataframe.dtypes.replace(replacements)))
+    col_str = ", ".join(
+        f"`{n}` {d}"
+        for n, d in zip(dataframe.columns, dataframe.dtypes.replace(replacements))
+    )
 
     return col_str, dataframe.columns
 
 
-def upload_to_db(host, port, dbname, user, password, tbl_name, col_str, file, dataframe, dataframe_columns):
+def upload_to_db(
+    host,
+    port,
+    dbname,
+    user,
+    password,
+    tbl_name,
+    col_str,
+    file,
+    dataframe,
+    dataframe_columns,
+):
     """Upload DataFrame to MySQL database."""
     # Connect to MySQL
     conn = pymysql.connect(
-        host=host,
-        port=int(port),
-        user=user,
-        password=password,
-        database=dbname
+        host=host, port=int(port), user=user, password=password, database=dbname
     )
     cursor = conn.cursor()
     print("Opened MySQL database successfully")

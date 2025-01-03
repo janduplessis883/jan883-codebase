@@ -1,5 +1,6 @@
 from IPython.display import HTML, Markdown, display
 
+
 def to_markdown(text):
     """
     Displays the given markdown text using IPython.display.Markdown.

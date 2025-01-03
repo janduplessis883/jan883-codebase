@@ -12,7 +12,9 @@ from google_sheets.sheethelper import *
 from llm.ollama import ask_ollama
 from notion_client.errors import APIResponseError
 
-sheethelper = SheetHelper(sheet_url='https://docs.google.com/spreadsheets/d/1k42kAuOIGDg83wP66dbZM9Zm69AdzPDNW6iKusMM6E4/edit?gid=0#gid=0')
+sheethelper = SheetHelper(
+    sheet_url="https://docs.google.com/spreadsheets/d/1k42kAuOIGDg83wP66dbZM9Zm69AdzPDNW6iKusMM6E4/edit?gid=0#gid=0"
+)
 
 today_string = datetime.now().isoformat()
 
@@ -85,7 +87,6 @@ def email():
             if imap.get_LastMethodSuccess() != True:
                 log_to_file_and_console(imap.lastErrorText())
                 sys.exit()
-
 
             print(f"✅ {count} Email read")
             subject = email.subject()
@@ -170,7 +171,9 @@ def email():
                                             "rich_text": [
                                                 {
                                                     "type": "text",
-                                                    "text": {"content": f"{email_body}"},
+                                                    "text": {
+                                                        "content": f"{email_body}"
+                                                    },
                                                 }
                                             ]
                                         },
@@ -198,7 +201,6 @@ def email():
                     # Send email to Google Sheet
                     # Clean to_do list for Google Sheet
 
-
                     date = email_date
                     subject = subject
                     email = email_addresses
@@ -208,8 +210,15 @@ def email():
                     notion_page_id = page_id
                     chroma_status = 0
 
-
-                    email_list = [date, subject, email, summary, body, notion_page_id, chroma_status]
+                    email_list = [
+                        date,
+                        subject,
+                        email,
+                        summary,
+                        body,
+                        notion_page_id,
+                        chroma_status,
+                    ]
                     sheethelper.append_row(email_list)
                 except APIResponseError as e:
                     print(f"APIResponseError {e}")

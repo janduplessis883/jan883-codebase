@@ -33,7 +33,7 @@ def scrape_website(start_url, depth, scrape_external=False):
         Returns:
         str: The combined text content from the URL.
         """
-        print(f"Scraping URL: {url}", end='\r', flush=True)
+        print(f"Scraping URL: {url}", end="\r", flush=True)
         try:
             response = requests.get(url)
             response.raise_for_status()
@@ -41,14 +41,16 @@ def scrape_website(start_url, depth, scrape_external=False):
 
             # Extract text from paragraphs, headers (h1, h2, h3)
             text_elements = []
-            text_elements.extend([h.get_text() for h in soup.find_all(["h1", "h2", "h3"])] )
+            text_elements.extend(
+                [h.get_text() for h in soup.find_all(["h1", "h2", "h3"])]
+            )
             text_elements.extend([p.get_text() for p in soup.find_all("p")])
 
             text = " ".join(text_elements)
-            print(f"Finished scraping URL: {url}", end='\r', flush=True)
+            print(f"Finished scraping URL: {url}", end="\r", flush=True)
             return text
         except requests.RequestException as e:
-            print(f"Request failed for URL {url}: {e}", end='\r', flush=True)
+            print(f"Request failed for URL {url}: {e}", end="\r", flush=True)
             return ""
 
     def get_links_from_url(url):
@@ -67,22 +69,27 @@ def scrape_website(start_url, depth, scrape_external=False):
             soup = BeautifulSoup(response.text, "html.parser")
             links = []
             for a_tag in soup.find_all("a", href=True):
-                link = urljoin(url, a_tag['href'])
-                if scrape_external or urlparse(link).netloc == urlparse(start_url).netloc:
+                link = urljoin(url, a_tag["href"])
+                if (
+                    scrape_external
+                    or urlparse(link).netloc == urlparse(start_url).netloc
+                ):
                     links.append(link)
             return links
         except requests.RequestException as e:
-            print(f"Failed to retrieve links from URL {url}: {e}", end='\r', flush=True)
+            print(f"Failed to retrieve links from URL {url}: {e}", end="\r", flush=True)
             return []
 
     # Sanitize the start_url to create a safe filename
-    sanitized_url = re.sub(r'[^a-zA-Z0-9]', '_', start_url)
+    sanitized_url = re.sub(r"[^a-zA-Z0-9]", "_", start_url)
     # Define the directory where the file will be saved
-    output_dir = os.path.expanduser('~/code/janduplessis883/jan883-codebase/webscraping/')
+    output_dir = os.path.expanduser(
+        "~/code/janduplessis883/jan883-codebase/webscraping/"
+    )
     # Ensure the directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Create the full path for the output file
-    file_name = os.path.join(output_dir, f'website_content_{sanitized_url}.txt')
+    file_name = os.path.join(output_dir, f"website_content_{sanitized_url}.txt")
 
     # Initialize the set of URLs to scrape, starting with the initial URL
     urls_to_scrape = [start_url]
@@ -91,7 +98,9 @@ def scrape_website(start_url, depth, scrape_external=False):
     print(f"\n🇾️ Starting scraping for the initial URL: {start_url} with depth {depth}")
 
     for current_depth in range(depth):
-        print(f"\n🔗 Depth {current_depth + 1}/{depth} - URLs to scrape: {len(urls_to_scrape)}")
+        print(
+            f"\n🔗 Depth {current_depth + 1}/{depth} - URLs to scrape: {len(urls_to_scrape)}"
+        )
         new_urls = []  # Store new URLs to scrape at the next depth level
 
         for idx, url in enumerate(urls_to_scrape):
@@ -99,7 +108,7 @@ def scrape_website(start_url, depth, scrape_external=False):
                 # Scrape the current URL's content
                 page_text = get_text_from_url(url)
                 # Append the scraped text to the file
-                with open(file_name, 'a', encoding='utf-8') as file:
+                with open(file_name, "a", encoding="utf-8") as file:
                     file.write(page_text + "\n")
 
                 # Get all links from the current URL and add them to new_urls
@@ -108,7 +117,9 @@ def scrape_website(start_url, depth, scrape_external=False):
                 scraped_urls.add(url)
 
                 # Update the output to show progress
-                print(f"   Scraped {idx + 1}/{len(urls_to_scrape)} URLs at depth {current_depth + 1}")
+                print(
+                    f"   Scraped {idx + 1}/{len(urls_to_scrape)} URLs at depth {current_depth + 1}"
+                )
 
         # Update the list of URLs to scrape with the new URLs for the next depth level
         print(f"\n💥 URLs found for next depth ({current_depth + 2}): {len(new_urls)}")
@@ -118,10 +129,11 @@ def scrape_website(start_url, depth, scrape_external=False):
     print(f"\n📁 You can find the output file at: {file_name}")
 
     # Read the combined text content from the file and return it
-    with open(file_name, 'r', encoding='utf-8') as file:
+    with open(file_name, "r", encoding="utf-8") as file:
         combined_text = file.read()
 
     return combined_text
+
 
 # Example usage in Jupyter Notebook
 # start_url = "https://docs.crewai.com"  # Replace with the URL you want to scrape
@@ -169,14 +181,14 @@ def remove_repeated_blocks_from_file(file_path, output_path, block_type="sentenc
     print(f"📄 Initial file size: {initial_file_size / 1024:.2f} KB")
 
     # Read the content of the file
-    with open(file_path, 'r', encoding='utf-8') as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
 
     # Split content into sentences or paragraphs based on the block type
     if block_type == "sentence":
-        blocks = re.split(r'(?<=[.!?])\s+', content)  # Split by sentences
+        blocks = re.split(r"(?<=[.!?])\s+", content)  # Split by sentences
     elif block_type == "paragraph":
-        blocks = content.split('\n\n')  # Split by paragraphs
+        blocks = content.split("\n\n")  # Split by paragraphs
     else:
         raise ValueError("Invalid block_type. Choose 'sentence' or 'paragraph'.")
 
@@ -193,10 +205,14 @@ def remove_repeated_blocks_from_file(file_path, output_path, block_type="sentenc
             progress_bar.update(1)
 
     # Join the cleaned blocks back into text
-    cleaned_text = '\n\n'.join(cleaned_blocks) if block_type == "paragraph" else ' '.join(cleaned_blocks)
+    cleaned_text = (
+        "\n\n".join(cleaned_blocks)
+        if block_type == "paragraph"
+        else " ".join(cleaned_blocks)
+    )
 
     # Save the cleaned content to a new file
-    with open(output_path, 'w', encoding='utf-8') as file:
+    with open(output_path, "w", encoding="utf-8") as file:
         file.write(cleaned_text)
 
     # Get the file size after processing
@@ -222,9 +238,9 @@ def remove_repeated_blocks(text, output_dir=None, block_type="sentence"):
 
     # Split content into sentences or paragraphs based on the block type
     if block_type == "sentence":
-        blocks = re.split(r'(?<=[.!?])\s+', text)  # Split by sentences
+        blocks = re.split(r"(?<=[.!?])\s+", text)  # Split by sentences
     elif block_type == "paragraph":
-        blocks = text.split('\n\n')  # Split by paragraphs
+        blocks = text.split("\n\n")  # Split by paragraphs
     else:
         raise ValueError("Invalid block_type. Choose 'sentence' or 'paragraph'.")
 
@@ -232,14 +248,18 @@ def remove_repeated_blocks(text, output_dir=None, block_type="sentence"):
     cleaned_blocks = remove_repeated_blocks_using_simhash(blocks)
 
     # Join the cleaned blocks back into text
-    cleaned_text = '\n\n'.join(cleaned_blocks) if block_type == "paragraph" else ' '.join(cleaned_blocks)
+    cleaned_text = (
+        "\n\n".join(cleaned_blocks)
+        if block_type == "paragraph"
+        else " ".join(cleaned_blocks)
+    )
 
     # Get the current datetime and format it
     current_datetime = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Set the default output directory if not provided
     if output_dir is None:
-        output_dir = os.path.expanduser('')
+        output_dir = os.path.expanduser("")
 
     # Ensure the directory exists
     os.makedirs(output_dir, exist_ok=True)
@@ -249,7 +269,7 @@ def remove_repeated_blocks(text, output_dir=None, block_type="sentence"):
     output_path = os.path.join(output_dir, output_filename)
 
     # Save the cleaned text to the output file
-    with open(output_path, 'w', encoding='utf-8') as file:
+    with open(output_path, "w", encoding="utf-8") as file:
         file.write(cleaned_text)
 
     print(f"✅ Cleaned text saved to: {output_path}")

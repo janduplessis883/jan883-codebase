@@ -1,6 +1,7 @@
 """
 This module contains the SimpleRAGPipeline and QueryEnhancedRAGPipeline classes for implementing RAG pipelines.
 """
+
 import weave
 
 
