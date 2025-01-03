@@ -1,4 +1,4 @@
-# **jan883-codebase** - EDA and Model Selection Toolkit
+# **jan883-codebase** - Data Science Collection
 ![jan883_codebase logo](images/logo2.png)
 
 This repository contains a collection of Python functions designed to streamline Exploratory Data Analysis (EDA) and model selection processes. The toolkit is divided into three main sections: **EDA Level 1**, **EDA Level 2**, **Model Selection** and a selection of other tools lick **NotionHelper**, helper class for the Official Notio API via `notion-client` each providing a set of utility functions to assist in data transformation, analysis, and model evaluation.
@@ -45,7 +45,7 @@ eda2()
 - `scaled_X_train, scaled_X_test = scale_X_train_X_test(X_train, X_test, scaler="standard", save_scaler=False)` Standard, MinMax and Robust Scaler. X_train uses fit_transform, X_test uses transform.
 - `sample_df(df, n_samples)` Take a sample of the full df.
 ---
-## Model Selection
+# Model Selection
 ```python
 from jan883_codebase.data_preprocessing.eda import *
 
@@ -58,7 +58,7 @@ ml0() # Run this function for a printout of included functions in Jupyter Notebo
 - `test_regression_models(X, y, test_size=0.2, random_state=None, scale_data=False)` Test Regression models.
 - `test_classification_models(X, y, test_size=0.2, random_state=None, scale_data=False)` Test Classification models.
 ---
-## NotionHelper class
+# NotionHelper class
 
 ```python
 import os
@@ -83,3 +83,6 @@ A helper class to interact with the **Notion API.**
 - `get_all_page_ids(database_id)`: Returns the IDs of all pages in a given Notion database.
 - `get_all_pages_as_json(database_id, limit=None)`: Returns a list of JSON objects representing all pages in the given database, with all properties.
 - `get_all_pages_as_dataframe(database_id, limit=None)`: Returns a Pandas DataFrame representing all pages in the given database, with selected properties.
+---
+# More function:
+NER, RAG, Semitment Analysis, Telegram API, Web Scrapping Tools
