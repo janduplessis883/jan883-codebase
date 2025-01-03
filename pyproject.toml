@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jan883_codebase"
-version = "0.1.1"
+version = "0.1.2"
 description = "Personal codebase for data science and machine learning projects. Includes data preprocessing, feature engineering, model selection, and model evaluation."
 readme = "README.md"
 authors = [
