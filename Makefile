@@ -15,11 +15,6 @@ clean:
 
 all: install clean
 
-app:
-	@streamlit run src/researchcrew_ai/streamlit_app.py
-
-research:
-	@python src/researchcrew_ai/research_eoi.py
 
 git_merge:
 	$(MAKE) clean

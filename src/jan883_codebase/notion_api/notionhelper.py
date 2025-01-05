@@ -7,44 +7,44 @@ import os
 # NotionHelper can be used in conjunction with the Streamlit APP: (Notion API JSON)[https://notioinapiassistant.streamlit.app]
 
 class NotionHelper:
-        '''
-        A helper class to interact with the Notion API.
+    '''
+    A helper class to interact with the Notion API.
 
-        Methods
-        -------
-        __init__():
-            Initializes the NotionHelper instance and authenticates with the Notion API.
+    Methods
+    -------
+    __init__():
+        Initializes the NotionHelper instance and authenticates with the Notion API.
 
-        authenticate():
-            Authenticates with the Notion API using a token from environment variables.
+    authenticate():
+        Authenticates with the Notion API using a token from environment variables.
 
-        get_database(database_id):
-            Fetches the schema of a Notion database given its database_id.
+    get_database(database_id):
+        Fetches the schema of a Notion database given its database_id.
 
-        notion_search_db(database_id, query=""):
-            Searches for pages in a Notion database that contain the specified query in their title.
+    notion_search_db(database_id, query=""):
+        Searches for pages in a Notion database that contain the specified query in their title.
 
-        notion_get_page(page_id):
-            Returns the JSON of the page properties and an array of blocks on a Notion page given its page_id.
+    notion_get_page(page_id):
+        Returns the JSON of the page properties and an array of blocks on a Notion page given its page_id.
 
-        create_database(parent_page_id, database_title, properties):
-            Creates a new database in Notion under the specified parent page with the given title and properties.
+    create_database(parent_page_id, database_title, properties):
+        Creates a new database in Notion under the specified parent page with the given title and properties.
 
-        new_page_to_db(database_id, page_properties):
-            Adds a new page to a Notion database with the specified properties.
+    new_page_to_db(database_id, page_properties):
+        Adds a new page to a Notion database with the specified properties.
 
-        append_page_body(page_id, blocks):
-            Appends blocks of text to the body of a Notion page.
+    append_page_body(page_id, blocks):
+        Appends blocks of text to the body of a Notion page.
 
-        get_all_page_ids(database_id):
-            Returns the IDs of all pages in a given Notion database.
+    get_all_page_ids(database_id):
+        Returns the IDs of all pages in a given Notion database.
 
-        get_all_pages_as_json(database_id, limit=None):
-            Returns a list of JSON objects representing all pages in the given database, with all properties.
+    get_all_pages_as_json(database_id, limit=None):
+        Returns a list of JSON objects representing all pages in the given database, with all properties.
 
-        get_all_pages_as_dataframe(database_id, limit=None):
-            Returns a Pandas DataFrame representing all pages in the given database, with selected properties.
-        '''
+    get_all_pages_as_dataframe(database_id, limit=None):
+        Returns a Pandas DataFrame representing all pages in the given database, with selected properties.
+    '''
 
     def __init__(self):
         self.authenticate()
