@@ -127,6 +127,7 @@ def eda2():
 - scale_df(X) should be used in exploration as it does not scale X_test.<BR>
 - scale_X_train_X_test(X_train, X_test, scaler="standard", save_scaler=False) is a full scaler solution, scales X_test (fittransform) and saves the scaler to disk.<BR>
 <b>Custom Functions</b><br>- <code>correlation_analysis(df, width=16, height=12)</code> Correlation Heatmap & Maximum pairwise correlation.<BR>
+- <code>check_multicollinearity(df)</code> Check for Multicollinearity.<BR>
 - <code>newDF, woeDF = iv_woe(df, target, bins=10, show_woe=False)</code> Returns newDF, woeDF. IV / WOE Values - Information Value (IV) quantifies the prediction power of a feature. We are looking for IV of 0.1 to 0.5. For those with IV of 0, there is a high chance it is the way it is due to imbalance of data, resulting in lack of binning. Keep this in mind during further analysis.<BR>
 - <code>individual_t_test_classification(df, y_column, y_value_1, y_value_2, list_of_features, alpha_val=0.05, sample_frac=1.0, random_state=None)</code> Statistical test of individual features - Classification problem.<BR>
 - <code>individual_t_test_regression(df, y_column, list_of_features, alpha_val=0.05, sample_frac=1.0, random_state=None)</code> Statistical test of individual features - Regressions problem.<BR>
@@ -983,6 +984,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import label_binarize
 from IPython.display import display, HTML
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 
 def evaluate_classification_model(model, X, y, cv=5):
@@ -1820,3 +1822,36 @@ def volcano_plot(df, reference_col):
         )
 
     plt.show()
+
+
+def check_multicollinearity(df):
+    """
+    Calculate VIF (Variance Inflation Factor) for each numeric column in the DataFrame.
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing features to check.
+
+    Returns:
+        pd.DataFrame: A DataFrame with two columns:
+            - 'feature': the column names
+            - 'VIF': the VIF value for that feature
+
+    Notes:
+        - Non-numeric columns are automatically excluded.
+        - Rows containing missing values (NaN) are dropped before VIF calculation.
+        - A VIF > 5 (or 10, depending on the threshold you adopt) often indicates high multicollinearity.
+    """
+    # 1) Select only numeric columns and drop rows with NaNs
+    numeric_df = df.select_dtypes(include=[np.number]).dropna()
+
+    # 2) Initialize a DataFrame for results
+    vif_data = pd.DataFrame()
+    vif_data["feature"] = numeric_df.columns
+
+    # 3) Compute VIF for each feature
+    vif_data["VIF"] = [
+        variance_inflation_factor(numeric_df.values, i)
+        for i in range(numeric_df.shape[1])
+    ]
+
+    return vif_data

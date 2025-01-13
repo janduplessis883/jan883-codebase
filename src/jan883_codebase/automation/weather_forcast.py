@@ -79,7 +79,9 @@ def main():
     ax.spines["right"].set_visible(False)
     ax.spines["left"].set_visible(False)
 
-    plt.savefig("log/7dayforecast.png")
+    plt.savefig(
+        "/Users/janduplessis/code/janduplessis883/jan883-codebase/log/7dayforecast.png"
+    )
     logger.info("Saved Image File. -  TEMP")
 
     fig, ax = plt.subplots(figsize=(12, 5))
@@ -98,7 +100,9 @@ def main():
     ax.yaxis.grid(True, linestyle="--", linewidth=0.5, color="#888888")
     ax.xaxis.grid(False)
     plt.title(f"7-Day Forcast London - Cloud Cover - {current_time}")
-    plt.savefig("log/7dayforcast - Cloud Cover.png")
+    plt.savefig(
+        "/Users/janduplessis/code/janduplessis883/jan883-codebase/log/7dayforcast - Cloud Cover.png"
+    )
     logger.info("Saved Image File. - CLOUD")
 
 

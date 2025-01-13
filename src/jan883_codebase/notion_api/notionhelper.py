@@ -6,8 +6,9 @@ import os
 
 # NotionHelper can be used in conjunction with the Streamlit APP: (Notion API JSON)[https://notioinapiassistant.streamlit.app]
 
+
 class NotionHelper:
-    '''
+    """
     A helper class to interact with the Notion API.
 
     Methods
@@ -44,7 +45,7 @@ class NotionHelper:
 
     get_all_pages_as_dataframe(database_id, limit=None):
         Returns a Pandas DataFrame representing all pages in the given database, with selected properties.
-    '''
+    """
 
     def __init__(self):
         self.authenticate()

@@ -15,6 +15,9 @@ clean:
 
 all: install clean
 
+weather:
+	@python src/jan883_codebase/automation/weather_forcast.py
+
 
 git_merge:
 	$(MAKE) clean
