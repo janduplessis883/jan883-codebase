@@ -95,14 +95,7 @@ def eda0():
 
 
 def eda1():
-    message = """<b>EDA Level 1 — Transformation of Original Data</b> <BR>1. I changed the column names to all be in small letters and spaces to be changed to underscore. I also changed it to names that I feel are more generic and categorized, for easy interpretation.
-2. I filled in the empty null / NaN rows with values I feel make sense.<BR>
-3. I changed the datatype to be more appropriate.<BR>
-4. Do data validation<BR>
-5. Mapping / Binning of Categorical Features<BR>
-6. LabelEncode a column.<BR>
-7. OneHotEncode a column.<BR>
-8. Impute missing values<br>
+    message = """<b>EDA Level 1 — Transformation of Original Data</b> <BR>I standardized the column names by converting them to lowercase and replacing spaces with underscores, ensuring they are more generic and categorized for easier interpretation. Missing values in the dataset were filled with sensible values to address null or NaN entries. I updated the data types of columns to ensure they are more appropriate for the data they represent. To ensure the data’s accuracy, I conducted validation checks. Categorical features were mapped or binned into meaningful groups for better analysis, and I applied Label Encoding to one column while using One-Hot Encoding for another. Additionally, missing values were imputed as part of the preprocessing steps.
 <b>Custom Functions</b><br>- <code>update_column_names(df)</code> Update Column names, replace " " with "_".<BR>
 - <code>label_encode_column(df, col_name)</code> Label encode a df column returing a df with the new column (original col dropped).<BR>
 - <code>one_hot_encode_column(df, col_name)</code> One Hot Encode a df column returing a df with the new column (original col dropped).<BR>
@@ -118,14 +111,7 @@ def eda1():
 
 def eda2():
     message = """<b>EDA Level 2 — Understanding of Transformed Data</b> <BR>
-- Correlation Analysis<BR>
-- IV / WOE Values - Information Value (IV) quantifies the prediction power of a feature. Short story is, we are looking for IV of 0.1 to 0.5. <0.1 weak, >0.5 to good to be true.<BR>
-- Feature Importance from Models<BR>
-- Statistical Tests<BR>
-- Create QQ Plots
-- Further Data Analysis on Imputed Data<BR>
-- scale_df(X) should be used in exploration as it does not scale X_test.<BR>
-- scale_X_train_X_test(X_train, X_test, scaler="standard", save_scaler=False) is a full scaler solution, scales X_test (fittransform) and saves the scaler to disk.<BR>
+I conducted a correlation analysis to understand relationships between variables and calculated Information Value (IV) and Weight of Evidence (WOE) values to assess the predictive power of features, aiming for an IV range of 0.1 to 0.5 (with values below 0.1 being weak and above 0.5 potentially too strong). Feature importance was evaluated using models, complemented by statistical tests for deeper insights. I also created QQ plots to assess data normality and performed further analysis on the imputed data. For scaling, the scale_df(X) method was used during exploration since it does not scale X_test. For a complete scaling solution, scale_X_train_X_test(X_train, X_test, scaler="standard", save_scaler=False) was applied, which scales both training and test sets, fits and transforms the data, and optionally saves the scaler to disk.
 <b>Custom Functions</b><br>- <code>correlation_analysis(df, width=16, height=12)</code> Correlation Heatmap & Maximum pairwise correlation.<BR>
 - <code>check_multicollinearity(df)</code> Check for Multicollinearity.<BR>
 - <code>newDF, woeDF = iv_woe(df, target, bins=10, show_woe=False)</code> Returns newDF, woeDF. IV / WOE Values - Information Value (IV) quantifies the prediction power of a feature. We are looking for IV of 0.1 to 0.5. For those with IV of 0, there is a high chance it is the way it is due to imbalance of data, resulting in lack of binning. Keep this in mind during further analysis.<BR>
@@ -150,14 +136,7 @@ def eda2():
 
 def model():
     message = """<b>Model Selection — Choosing the right Model.</b> <BR>
-- Feature Importance Plot<BR>
-- Learning Curve (Regression and Classification)<BR>
-- Plot Recursive Feature Elimination with Cross-validation. (Regression and Classification)<BR>
-- Evaluate Classification Model<BR>
-- Evaluate Regression Model<BR>
-- Best Regression Models - Evaluate multiple models to find the best metrics.<BR>
-- Best Classification Models - Evaluate multiple models to find the best metrics.<BR>
-- Clustering Analysis - Elbow Method, Intercluster Distance and Silhouette Visualizer.<BR>
+ generated a feature importance plot to visualize the significance of features and created learning curves for both regression and classification tasks to assess model performance over varying dataset sizes. Recursive Feature Elimination with Cross-Validation (RFECV) was plotted for both regression and classification to identify the optimal subset of features. Classification and regression models were thoroughly evaluated, including assessing multiple models to determine the best-performing ones based on relevant metrics. Additionally, clustering analysis was conducted using the Elbow Method, Intercluster Distance, and Silhouette Visualizer to evaluate cluster quality and identify optimal cluster numbers.
 <b>Custom Functions</b><br>
 - <code>feature_importance_plot(model, X, y)</code> Plot Feature Importance using a single model.<BR>
 - <code>plot_learning_curve(X, y, problem_type='classification', scoring='accuracy')</code> Plot Learning Curve using a single model, classification or regression. <BR>
