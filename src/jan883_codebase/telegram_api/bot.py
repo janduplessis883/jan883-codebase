@@ -6,6 +6,16 @@ chat_id = os.getenv("CHAT_ID")
 
 
 def telegram_send(bot_message, chat_id=chat_id):
+    """
+    Sends a message to a specified Telegram chat using the Telegram Bot API.
+
+    Args:
+        bot_message (str): The message to be sent to the Telegram chat.
+        chat_id (str): The unique identifier for the target chat or username of the target channel (optional).
+
+    Returns:
+        dict: The JSON response from the Telegram API containing the status and details of the sent message.
+    """
     send_text = "https://api.telegram.org/bot" + telegram_bot_token + "/sendMessage"
     response = requests.get(
         send_text,
@@ -19,6 +29,17 @@ def telegram_send(bot_message, chat_id=chat_id):
 
 
 def telegram_send_image(image_path, chat_id=chat_id, caption=None):
+    """
+    Sends an image to a specified Telegram chat.
+
+    Args:
+        image_path (str): The file path to the image to be sent.
+        chat_id (int): The unique identifier for the target chat.
+        caption (str, optional): The caption for the image. Defaults to None.
+
+    Returns:
+        dict: The JSON response from the Telegram API.
+    """
     send_photo_url = f"https://api.telegram.org/bot{telegram_bot_token}/sendPhoto"
 
     with open(image_path, "rb") as image_file:

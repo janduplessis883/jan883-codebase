@@ -68,7 +68,7 @@ def main():
     import seaborn as sns
 
     fig, ax = plt.subplots(figsize=(12, 5))
-    sns.lineplot(data=hourly_dataframe, x="date", y="temperature_2m", color="#d95442")
+    sns.lineplot(data=hourly_dataframe, x="date", y="temperature_2m", color="#d95442", linewidth=3)
     sns.lineplot(
         data=hourly_dataframe, x="date", y="apparent_temperature", color="#d7d8d7"
     )

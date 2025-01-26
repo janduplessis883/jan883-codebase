@@ -18,6 +18,12 @@ all: install clean
 weather:
 	@python src/jan883_codebase/automation/weather_forcast.py
 
+trending_python:
+	@python src/jan883_codebase/automation/trending_repos.py
+
+files:
+	@python src/jan883_codebase/automation/organize_files.py
+
 
 git_merge:
 	$(MAKE) clean
