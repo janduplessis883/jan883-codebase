@@ -86,6 +86,3 @@ A helper class to interact with the **Notion API.**
 ---
 # More function:
 NER, RAG, Semitment Analysis, Telegram API, Web Scrapping Tools
-
-
-### [Example Deepnote Notebook](https://deepnote.com/workspace/Jans-Team-dc9449a1-8aab-44a0-a4c2-577280c6908e/project/jan883codebase-Walk-through-2da6b2b0-32cb-4db2-8e49-1f3514edd142/notebook/Notebook-1-ae733a1529594694a9bd21702502ba10?utm_source=share-modal&utm_medium=product-shared-content&utm_campaign=notebook&utm_content=2da6b2b0-32cb-4db2-8e49-1f3514edd142)
